@@ -1,28 +1,32 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "addnewfriend.h"
+#include "serverinterface.h"
 #include <stdio.h>
 #include <QObject>
-
+#include "chat.h"
 
 void MainWindow::onListMailItemClicked(QListWidgetItem* item)
 {
-    QString name = item->text();
-    printf("%s\n", name.toStdString().c_str());
+    QString friend_name = item->text();
+    user_chat.reset(new Chat(0, user_name, friend_name, &server));
+    user_chat->show();
 }
 
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
 {
+//    user_name = "test_user_name";
+//    user_name = "Maksim";
+    user_name = "Ne Maksim";
     ui->setupUi(this);
+    connect(ui->friends, SIGNAL(itemClicked(QListWidgetItem*)),
+                this, SLOT(onListMailItemClicked(QListWidgetItem*)));
+    server = ServerInterface(user_name);
+
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
 
 
 
@@ -36,10 +40,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionAdd_user_triggered()
 {
-    QListWidgetItem *newItem = new QListWidgetItem;
-    newItem->setText("newitem");
-    connect(ui->Friends, SIGNAL(itemClicked(QListWidgetItem*)),
-                this, SLOT(onListMailItemClicked(QListWidgetItem*)));
-
-    ui->Friends->insertItem(1, newItem);
+    add_new_friend_window.reset(new AddNewFriend(0, ui->friends, &server));
+    add_new_friend_window->show();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
