@@ -1,3 +1,4 @@
+/*
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -194,9 +195,19 @@ int main(){
     }
 
   }
-  
+}
+*/
 
-  
+#include "server.h"
+#include <thread>
+#include <chrono>
+#include <poll.h>
 
-
+int main(){
+  using namespace std::chrono_literals;
+  Server server;
+  while (true){
+    std::this_thread::sleep_for(100ms);
+    server.Next();
+  }
 }
