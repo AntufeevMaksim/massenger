@@ -5,6 +5,7 @@
 #include "serverinterface.h"
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 void Chat::CheckNewMessage(){
     QString message = server->ReadMessage(friend_name);

@@ -22,7 +22,7 @@ public:
 
 private:
     std::unique_ptr<Ui::AddNewFriend> ui = std::make_unique<Ui::AddNewFriend>();
-    std::unique_ptr<QListWidget> friends;
+    QListWidget* friends;
     void GetAllUsers();
     ServerInterface *server;
 

@@ -1,5 +1,7 @@
 #include "serverinterface.h"
-
+#include <thread>
+#include <chrono>
+#include <poll.h>
 /*
 Client::Client(std::vector<char>& name, std::vector<char>& message){
     _message = message;
@@ -25,35 +27,25 @@ void Client::AddMessage(std::vector<char>& message){
     }
 }
 */
-
-
-
-
-
-int ServerInterface::Connect_to_server(){
-    local.sin_family = AF_INET;
-    local.sin_port = htons(8888);
-    local.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-    sock = socket( AF_INET, SOCK_STREAM, 0);
-    if (sock < 0){
-      perror("socket error");
+/*
+ServerInterface::~ServerInterface(){
+    std::vector<char> std_user_name;
+    std_user_name.push_back('b');
+    for (char c : user_name){
+        std_user_name.push_back(c);
     }
-
-    int rc = connect(sock, (struct sockaddr*)&local, sizeof(local));
-    if (rc){
-      perror("error connect");
-    }
-    return sock;
+    server.BreakConnection(std_user_name);
 }
+*/
+
+
 
 ServerInterface::ServerInterface(QString& user_name){
 
-    sock = Connect_to_server();
-    std::string std_user_name = user_name.toStdString();
-    send(sock, std_user_name.c_str(), std_user_name.size(), 0);
+//    server = Server();
+    std::string std_user_name = "n" + user_name.toStdString();
 
-
+    server.SendMessage(std_user_name);
 }
 
 
@@ -62,9 +54,10 @@ ServerInterface::ServerInterface(QString& user_name){
 std::string ServerInterface::Get_system_info(QString& friend_name, QString& user_name)
 {
     std::string system_info;
-    system_info += user_name.toStdString();
-    system_info += "|";
+    system_info += "r";
     system_info += friend_name.toStdString();
+    system_info += "|";
+    system_info += user_name.toStdString();
     system_info += "|";
 
     return system_info;
@@ -75,35 +68,9 @@ void ServerInterface::SendMessage(QString& message, QString& friend_name, QStrin
 
     std_message += message.toStdString();
 
-    send(sock, std_message.c_str(), std_message.size(), 0);
+    server.SendMessage(std_message);
 
 }
-
-std::vector<char> ServerInterface::Read(int s){
-  fd_set readfs;
-  FD_ZERO(&readfs);
-  FD_SET(s, &readfs);
-
-  struct timeval tv;
-  tv.tv_sec = 0;
-  tv.tv_usec = 100;
-
-  int n;
-
-  int res = select(s+1, &readfs, NULL, NULL, &tv);
-//  int rc = recv(s, buf.data(), 3, 0);
-  if (res>0){
-    ioctl(s, TIOCINQ, &n);
-    std::vector<char> buf(n);
-    int rc = recv(s, buf.data(), n, 0);
-    printf("%s", buf.data());
-    return (rc == 0 ? std::vector<char>{} : buf);
-  }
-  else{
-    return {};
-  }
-}
-
 
 std::vector<char> ServerInterface::GetWhoSend(std::vector<char>& message){
     std::vector<char> who_send;
@@ -156,14 +123,18 @@ void ServerInterface::ReadMessage(){
 
 
 QString ServerInterface::ReadMessage(QString& friend_name){
-    std::vector<char> message = Read(sock);
+    std::vector<char> message = server.ReadMessage();
     if (!message.empty()){
         if (QString(GetWhoSend(message).data()) == friend_name){
             DeleteSystemInfo(message);
-            return QString(message.data());
+            QString ready_message;
+            for (char c : message){
+                ready_message.append(c);
+            }
+            return QString(ready_message);
         }
-
     }
+    return QString();
 }
 
 
@@ -181,13 +152,59 @@ ServerInterface::ServerInterface(){}
 
 
 std::vector<std::string> ServerInterface::GetAllUsers(){
+    using namespace std::chrono_literals;
     std::vector<std::string> all_users;
 
-    all_users.push_back(std::string("Maksim"));
-    all_users.push_back(std::string("Ne Maksim"));
+//    all_users.push_back(std::string("Maksim"));
+//    all_users.push_back(std::string("Ne Maksim"));
+    std::vector<char> answer;
+    std::string request{'g'};
+    server.SendMessage(request);
+    while (answer.empty()){
+        std::this_thread::sleep_for(100ms);
+        answer = server.ReadMessage();
+    }
+    std::string name;
+    for (char c : answer){
+        if (c == '\n'){
+            all_users.push_back(name);
+            name.clear();
+        }
+        else{
+            name.push_back(c);
+        }
+    }
+
+    all_users.push_back(name);
     return all_users;
 
 }
+
+QString ServerInterface::GetUsersStatus(QString &users){
+    using namespace std::chrono_literals;
+    QString ready_answer;
+    users = "s" + users;
+    std::string std_users = users.toStdString();
+    server.SendMessage(std_users);
+    std::vector<char> answer;
+    while (answer.empty()){
+        std::this_thread::sleep_for(100ms);
+        answer = server.ReadMessage();
+    }
+    for (char c : answer){
+        ready_answer.append(c);
+    }
+    return ready_answer;
+}
+
+
+
+
+void ServerInterface::BreakConnection(){
+    std::string b{"b"};
+    server.SendMessage(b);
+}
+
 
 
 
