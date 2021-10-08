@@ -2,12 +2,12 @@
 #define CLIENT_H
 
 
-#include <vector>
+#include <string>
 
 
 struct Client
 {
-  std::vector<char> name;
+  std::string name;
   int connection;
 };
 

@@ -1,25 +1,30 @@
 #include "message.h"
 
-Message::Message(std::vector<char> message, int who_send_sock){
+Message::Message(std::string message, int who_send_sock){
    _who_send_sock = who_send_sock;
   switch (message[0])
   {
   case 'r':
     message.erase(message.begin());
     ParseRegularMessage(message);
-    _type = Message::REGULAR;
+    _type = REGULAR;
     break;
   
   case 'g':
-    _type = Message::GET_ALL_USERS;
+    _type = GET_ALL_USERS;
     break;
 
   case 'b':
-    _type = Message::BROKE_CONNECTION;
+    _type = BROKE_CONNECTION;
     break;
 
   case 's':
-    _type = Message::GET_USERS_STATUS;
+    _type = GET_USERS_STATUS;
+    message.erase(message.begin());
+    _text = message;
+
+  case 'n':
+    _type = SET_USER_NAME;
     message.erase(message.begin());
     _text = message;
   default:
@@ -41,9 +46,9 @@ Message::Message(std::vector<char> message, int who_send_sock){
 
 }
 
-void Message::ParseRegularMessage(std::vector<char>& message){
+void Message::ParseRegularMessage(std::string& message){
   int i = 0;
-  std::vector<char> buf;
+  std::string buf;
   for (char c : message){
     if (c == '|'){
       if (_whom_send.empty()){
@@ -63,8 +68,8 @@ void Message::ParseRegularMessage(std::vector<char>& message){
   _text = buf;
 }
 
-std::vector<char> Message::Formation(){
-  std::vector<char> ready_message;
+std::string Message::Formation(){
+  std::string ready_message;
   if (_type == Message::REGULAR){
     ready_message = _who_send;
     ready_message.push_back('|');
@@ -75,18 +80,18 @@ std::vector<char> Message::Formation(){
   return ready_message;  
 }
 
-std::vector<char> Message::GetText(){
+std::string Message::GetText(){
   return _text;
 }
 Message::TypeMessage Message::GetType(){
   return _type;
 }
 
-std::vector<char> Message::GetWhomSend(){
+std::string Message::GetWhomSend(){
   return _whom_send;
 }
 
-std::vector<char> Message::GetWhoSend(){
+std::string Message::GetWhoSend(){
   return _who_send;
 }
 

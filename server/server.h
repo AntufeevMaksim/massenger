@@ -12,12 +12,15 @@ private:
   std::vector<Client> clients;
   void AddNewConnection();
   void Send(Message& message);
-  Client FindUser(std::vector<char>& name);
-  Message ParseMessage(std::vector<char>& message, int who_send_sock);
-  Message ParseRegularMessage(std::vector<char>& message);
+  Client FindUser(std::string& name);
+//  Message ParseMessage(std::vector<char>& message, int who_send_sock);
+//  Message ParseRegularMessage(std::vector<char>& message);
+  std::vector<Message> GetMessages(std::string& str_message, int who_send_sock);
   std::vector<char> MessageFormation(Message& message);
   void BrokeOldConnection(int sock);
-  bool IsActiveUser(std::string user);
+  void SetUserName(Message& message);
+  bool IsActiveUser(std::string& user);
+  bool IsMessageDelemiter(int i, std::string& str);
 public:
   Server();
   void Next();

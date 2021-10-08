@@ -20,7 +20,7 @@ public:
   Connection();
   void Send(int s, std::vector<char>& message);
   void Send(int s, std::string& buf);
-  std::vector<char> Read(int s);
+  std::string Read(int s);
   int accept_new_connection();
 };
 

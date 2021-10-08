@@ -37,7 +37,7 @@ void Connection::Connect(){
   fcntl(_sock, F_SETFL, O_NONBLOCK);  
 }
 
-std::vector<char> Connection::Read(int s ){
+std::string Connection::Read(int s ){
   fd_set readfs;
   FD_ZERO(&readfs);
   FD_SET(s, &readfs);
@@ -55,8 +55,7 @@ std::vector<char> Connection::Read(int s ){
     ioctl(s, TIOCINQ, &n);
     std::vector<char> buf(n);
     int rc = recv(s, buf.data(), n, 0);
-//    std::string message = buf.data();
-    return (rc == 0 ? std::vector<char>{} : buf);
+    return (rc == 0 ? std::string{} : std::string{buf.data()});
   }
   else{
     return {};
