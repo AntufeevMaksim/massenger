@@ -17,6 +17,7 @@ private:
   Message ParseRegularMessage(std::vector<char>& message);
   std::vector<char> MessageFormation(Message& message);
   void BrokeOldConnection(int sock);
+  bool IsActiveUser(std::string user);
 public:
   Server();
   void Next();
