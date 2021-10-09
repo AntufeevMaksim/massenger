@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::on_actionAdd_user_triggered()
 {
     add_new_friend_window.reset(new AddNewFriend(0, ui->friends, &server));
+    add_new_friend_window->setWindowTitle("Add New User");
     add_new_friend_window->show();
 }
 

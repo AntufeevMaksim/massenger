@@ -34,11 +34,11 @@ class ServerInterface
 
 public:
     ServerInterface();
-    ServerInterface(QString& user_name);
+    ServerInterface(QString user_name);
 //    ~ServerInterface();
     void SendMessage(QString& message, QString& friend_name, QString& user_name);
     QString ReadMessage(QString& friend_name);
-    std::vector<std::string> GetAllUsers();
+    std::vector<QString> GetAllUsers();
     void BreakConnection();
     QString GetUsersStatus(QString& users);
 
@@ -46,9 +46,9 @@ private:
     std::string user_name;
 //    std::vector<Client> clients;
     Server server;
-    std::string Get_system_info(QString& friend_name, QString& user_name);
-    std::vector<char> GetWhoSend(std::vector<char>& message);
-    void DeleteSystemInfo(std::vector<char>& message);
+    QString Get_system_info(QString& friend_name, QString& user_name);
+    QString GetWhoSend(QString& message);
+    void DeleteSystemInfo(QString& message);
 //    void AddNewMessage(std::vector<char>& who_send, std::vector<char>& message);
 };
 

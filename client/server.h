@@ -9,13 +9,14 @@
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
+#include <QString>
 
 class Server
 {
 public:
     Server();
-    void SendMessage(std::string& message);
-    std::vector<char> ReadMessage();
+    void SendMessage(QString& message);
+    QString ReadMessage();
 
 private:
     int sock;

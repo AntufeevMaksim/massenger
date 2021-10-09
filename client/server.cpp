@@ -30,7 +30,7 @@ int Server::Connect(){
 }
 
 
-std::vector<char> Server::ReadMessage(){
+QString Server::ReadMessage(){
     fd_set readfs;
     FD_ZERO(&readfs);
     FD_SET(sock, &readfs);
@@ -47,7 +47,11 @@ std::vector<char> Server::ReadMessage(){
       ioctl(sock, TIOCINQ, &n);
       std::vector<char> buf(n);
       int rc = recv(sock, buf.data(), n, 0);
-      return (rc == 0 ? std::vector<char>{} : buf);
+      QString ready_message;
+      for (char c : buf){
+          ready_message.push_back(c);
+      }
+      return (rc == 0 ? QString{} : ready_message);
     }
     else{
       return {};
@@ -55,12 +59,12 @@ std::vector<char> Server::ReadMessage(){
 }
 
 
-void Server::SendMessage(std::string& message){
+void Server::SendMessage(QString& message){
     if (sock < 0){
         perror("sock < 0");
     }
     message += "#?#";
-    int rc = send(sock, message.data(), message.size(), 0);
+    int rc = send(sock, message.toStdString().c_str(), message.size(), 0);
     if (rc <= 0){
       perror("error send");
     }

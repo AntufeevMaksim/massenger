@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <poll.h>
+#include <message.h>
 /*
 Client::Client(std::vector<char>& name, std::vector<char>& message){
     _message = message;
@@ -40,41 +41,41 @@ ServerInterface::~ServerInterface(){
 
 
 
-ServerInterface::ServerInterface(QString& user_name){
+ServerInterface::ServerInterface(QString user_name){
 
 //    server = Server();
-    std::string std_user_name = "n" + user_name.toStdString();
-
-    server.SendMessage(std_user_name);
+//    std::string std_user_name = "n" + user_name.toStdString();
+    user_name = 'n' + user_name;
+    server.SendMessage(user_name);
 }
 
 
 
 
-std::string ServerInterface::Get_system_info(QString& friend_name, QString& user_name)
+QString ServerInterface::Get_system_info(QString& friend_name, QString& user_name)
 {
-    std::string system_info;
+    QString system_info;
     system_info += "r";
-    system_info += friend_name.toStdString();
+    system_info += friend_name;
     system_info += "|";
-    system_info += user_name.toStdString();
+    system_info += user_name;
     system_info += "|";
 
     return system_info;
 }
 
 void ServerInterface::SendMessage(QString& message, QString& friend_name, QString& user_name){
-    std::string std_message = Get_system_info(friend_name, user_name);
+    QString ready_message = Get_system_info(friend_name, user_name);
+    ready_message += message;
+//    std_message += message.toStdString();
 
-    std_message += message.toStdString();
-
-    server.SendMessage(std_message);
+    server.SendMessage(ready_message);
 
 }
 
-std::vector<char> ServerInterface::GetWhoSend(std::vector<char>& message){
-    std::vector<char> who_send;
-    for (char c : message){
+QString ServerInterface::GetWhoSend(QString& message){
+    QString who_send;
+    for (QChar c : message){
         if (c == '|'){
             return who_send;
         }
@@ -82,56 +83,31 @@ std::vector<char> ServerInterface::GetWhoSend(std::vector<char>& message){
     }
 }
 
-void ServerInterface::DeleteSystemInfo(std::vector<char>& message){
+void ServerInterface::DeleteSystemInfo(QString& message){
     int i = 0;
-      for (char c : message){
+      for (QChar c : message){
         if (c == '|'){
-          message.erase(message.begin(), message.begin() + i+1);
+          message.remove(0, i+1);
           break;
         }
       i++;
       }
 }
 
-/*
-void ServerInterface::AddNewMessage(std::vector<char>& who_send, std::vector<char>& message){
-    for (Client client : clients){
-        if (client.GetName() == who_send){
-            client.AddMessage(message);
-        }
-    }
-
-    Client client(who_send, message);
-    clients.push_back(client);
-}
-*/
-
-
-
-
-/*
-void ServerInterface::ReadMessage(){
-    std::vector<char> message = Read(sock);
-    if (!message.empty()){
-        std::vector<char> who_send = GetWhoSend(message);
-        DeleteSystemInfo(message);
-        AddNewMessage(who_send, message);
-    }
-}
-*/
-
-
 
 QString ServerInterface::ReadMessage(QString& friend_name){
-    std::vector<char> message = server.ReadMessage();
-    if (!message.empty()){
+    QString message = server.ReadMessage();
+    if (!message.isEmpty()){
+
         if (QString(GetWhoSend(message).data()) == friend_name){
             DeleteSystemInfo(message);
             QString ready_message;
+            /*
             for (char c : message){
                 ready_message.append(c);
             }
-            return QString(ready_message);
+            */
+            return message /*QString(ready_message)*/;
         }
     }
     return QString();
@@ -151,21 +127,21 @@ ServerInterface::ServerInterface(){}
 
 
 
-std::vector<std::string> ServerInterface::GetAllUsers(){
+std::vector<QString> ServerInterface::GetAllUsers(){
     using namespace std::chrono_literals;
-    std::vector<std::string> all_users;
+    std::vector<QString> all_users;
 
 //    all_users.push_back(std::string("Maksim"));
 //    all_users.push_back(std::string("Ne Maksim"));
-    std::vector<char> answer;
-    std::string request{'g'};
+    QString answer;
+    QString request{'g'};
     server.SendMessage(request);
-    while (answer.empty()){
+    while (answer.isEmpty()){
         std::this_thread::sleep_for(100ms);
         answer = server.ReadMessage();
     }
-    std::string name;
-    for (char c : answer){
+    QString name;
+    for (QChar c : answer){
         if (c == '\n'){
             all_users.push_back(name);
             name.clear();
@@ -184,14 +160,14 @@ QString ServerInterface::GetUsersStatus(QString &users){
     using namespace std::chrono_literals;
     QString ready_answer;
     users = "s" + users;
-    std::string std_users = users.toStdString();
-    server.SendMessage(std_users);
-    std::vector<char> answer;
-    while (answer.empty()){
+//    std::string std_users = users.toStdString();
+    server.SendMessage(users);
+    QString answer;
+    while (answer.isEmpty()){
         std::this_thread::sleep_for(100ms);
         answer = server.ReadMessage();
     }
-    for (char c : answer){
+    for (QChar c : answer){
         ready_answer.append(c);
     }
     return ready_answer;
@@ -201,7 +177,7 @@ QString ServerInterface::GetUsersStatus(QString &users){
 
 
 void ServerInterface::BreakConnection(){
-    std::string b{"b"};
+    QString b{'b'};
     server.SendMessage(b);
 }
 

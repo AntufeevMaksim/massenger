@@ -17,10 +17,10 @@ AddNewFriend::AddNewFriend(QWidget *parent, QListWidget* _friend, ServerInterfac
 
 
 void AddNewFriend::GetAllUsers(){
-   std::vector<std::string> name_all_users = server->GetAllUsers();
-   for (std::string& name : name_all_users){
+   std::vector<QString> name_all_users = server->GetAllUsers();
+   for (QString& name : name_all_users){
        QListWidgetItem *user = new QListWidgetItem;
-       user->setText(name.c_str());
+       user->setText(name);
        ui->list_all_users->addItem(user);
    }
 }
