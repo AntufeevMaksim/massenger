@@ -22,11 +22,13 @@ Message::Message(std::string message, int who_send_sock){
     _type = GET_USERS_STATUS;
     message.erase(message.begin());
     _text = message;
+    break;
 
   case 'n':
     _type = SET_USER_NAME;
     message.erase(message.begin());
     _text = message;
+    break;
   default:
     break;
   }
@@ -71,11 +73,13 @@ void Message::ParseRegularMessage(std::string& message){
 std::string Message::Formation(){
   std::string ready_message;
   if (_type == Message::REGULAR){
-    ready_message = _who_send;
+    ready_message += 'r';
+    ready_message += _who_send;
     ready_message.push_back('|');
     for (char c : _text){
       ready_message.push_back(c);
     }
+    ready_message += "#?#";
   }
   return ready_message;  
 }

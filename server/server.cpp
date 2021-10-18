@@ -45,18 +45,19 @@ if (message.GetType() == Message::BROKE_CONNECTION){
 }
 
 if (message.GetType() == Message::GET_ALL_USERS){
-    std::string users;
+    std::string users{'g'};
     std::string line;
     std::fstream file("users");
     while(getline(file, line)){
       users += line += "\n";
     }
+    users += "#?#";
     file.close();
     connection.Send(message.GetWhoSendSock(), users);
 }
 
 if (message.GetType() == Message::GET_USERS_STATUS){
-    std::string answer;
+    std::string answer{'s'};
     std::string name;
     for (char c : message.GetText()){
       if (c == '\n'){
@@ -68,8 +69,11 @@ if (message.GetType() == Message::GET_USERS_STATUS){
         }
         name.clear();
       }
-      name += c;
+      else{
+        name += c;
+      }
     }
+    answer += "#?#";
     connection.Send(message.GetWhoSendSock(), answer);
 }
 
@@ -93,6 +97,7 @@ Client Server::FindUser(std::string& name){
       return client;
     }
   }
+  return Client();
 }
 
 void Server::AddNewConnection(){
@@ -120,7 +125,7 @@ void Server::AddNewConnection(){
 
 void Server::BrokeOldConnection(int sock){
 
-  for (int i=0; i<clients.size(); i++){
+  for (size_t i=0; i<clients.size(); i++){
     if (clients[i].connection == sock){
       clients.erase(clients.begin()+i);
       break;
@@ -142,10 +147,10 @@ std::vector<Message> Server::GetMessages(std::string& str_message, int who_send_
   std::vector<Message> messages;
   std::string message;
   int last_delemiter = 0;
-  for (int i = 0; i < str_message.size()-2; i++)
+  for (size_t i = 0; i < str_message.size()-2; i++)
   {
     if (IsMessageDelemiter(i, str_message)){
-      messages.push_back(Message(str_message.substr(last_delemiter, i), who_send_sock));
+      messages.push_back(Message(str_message.substr(last_delemiter, i-last_delemiter), who_send_sock));
       last_delemiter = i + 3;
     }
   }

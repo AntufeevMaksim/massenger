@@ -47,7 +47,6 @@ std::string Connection::Read(int s ){
   tv.tv_usec = 100;
 
   int n;
-  unsigned int m;
 
   int res = select(s+1, &readfs, NULL, NULL, &tv);
 //  int rc = recv(s, buf.data(), 3, 0);
@@ -55,7 +54,7 @@ std::string Connection::Read(int s ){
     ioctl(s, TIOCINQ, &n);
     std::vector<char> buf(n);
     int rc = recv(s, buf.data(), n, 0);
-    return (rc == 0 ? std::string{} : std::string{buf.data()});
+    return (rc <= 0 ? std::string{} : std::string{buf.data()});
   }
   else{
     return {};
