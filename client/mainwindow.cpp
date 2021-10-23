@@ -5,7 +5,18 @@
 #include <QObject>
 #include "chat.h"
 #include <fstream>
-void MainWindow::onListMailItemClicked(QListWidgetItem* item)
+#include <algorithm>
+#include "setusername.h"
+#include "userdata.h"
+
+void MainWindow::on_actionSet_username_triggered(){
+    set_username.reset(new SetUsername(0, &user_name, &server));
+    set_username->show();
+}
+
+
+
+void MainWindow::onListMailItemClicked(QListWidgetItem *item)
 {
     QString friend_name = item->text();
     user_chat.reset(new Chat(0, user_name, friend_name, &server));
@@ -13,43 +24,46 @@ void MainWindow::onListMailItemClicked(QListWidgetItem* item)
 }
 
 void MainWindow::onListMailItemDoubleClicked(QListWidgetItem *item){
-    delete ui->friends->takeItem(ui->friends->row(item));
+    /*
+    std::string name;
+    std::vector<std::string> friends;
+    std::fstream file("my_friends", file.out);
+    for (int i = 0; i < ui->friends->count(); i++) {
+        friends.push_back(ui->friends->item(i)->text().toStdString());
+    }
+    auto i = std::remove(friends.begin(), friends.end(), item->text().toStdString());
+    friends.erase(i, friends.end());
 
+    for(std::string name : friends){
+        file << name + "\n";
+    }
+    file.close();
+    delete ui->friends->takeItem(ui->friends->row(item));
+*/
+    UserData::DeleteFriend(*(ui->friends), *item);
 }
 
 void MainWindow::CheckFriendsStatus(){
     QString all_friends;
     for (int i = 0; i < ui->friends->count(); ++i){
-//        all_friends += ui->friends->takeItem(i)->text() + "\n";
+        all_friends += ui->friends->item(i)->text() + "\n";
     }
     QString friens_status = server.GetUsersStatus(all_friends);
-/*
-    for (int i = 0; i < friens_status.size(); ++i) {
+    if(friens_status.isEmpty()){
+        return;
+    }
+
+    for (int i = 0; i < ui->friends->count(); ++i) {
         if (friens_status[i] == "1"){
-            ui->friends->takeItem(i)->setBackground(Qt::green);
+            ui->friends->item(i)->setBackground(Qt::green);
         }
         else{
-           ui->friends->takeItem(i)->setBackground(Qt::red);
+           ui->friends->item(i)->setBackground(Qt::red);
         }
     }
-*/
+
 }
 
-
-
-
-void MainWindow::LoadListFriends(){
-    std::string name;
-    std::fstream file("my_friends");
-    while(getline(file, name)){
-        if (!name.empty()){
-            QListWidgetItem *user = new QListWidgetItem();
-            user->setText(name.c_str());
-            ui->friends->addItem(user);
-        }
-    }
-    file.close();
-}
 
 
 
@@ -58,9 +72,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
 //    user_name = "test_user_name";
 //    user_name = "Maksim";
-    user_name = "Ne Maksim";
+    user_name = UserData::LoadUsername();
+//    user_name = "Ne Maksim";
     ui->setupUi(this);
-    LoadListFriends();
+    UserData::LoadListFriends(*(ui->friends));
     connect(ui->friends, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
                 this, SLOT(onListMailItemDoubleClicked(QListWidgetItem*)));
 
@@ -68,8 +83,8 @@ MainWindow::MainWindow(QWidget *parent)
                 this, SLOT(onListMailItemClicked(QListWidgetItem*)));
 
     server = ServerInterface(user_name);
-//    connect(&check_friends_status, SIGNAL(timeout()), this, SLOT(CheckFriendsStatus()));
-//    check_friends_status.start(1000);
+    connect(&check_friends_status, SIGNAL(timeout()), this, SLOT(CheckFriendsStatus()));
+    check_friends_status.start(1000);
 
 }
 
@@ -87,7 +102,6 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::on_actionAdd_user_triggered()
 {
     add_new_friend_window.reset(new AddNewFriend(0, ui->friends, &server));
-    add_new_friend_window->setWindowTitle("Add New User");
     add_new_friend_window->show();
 }
 

@@ -10,7 +10,7 @@
 #include <poll.h>
 #include <server.h>
 #include <QObject>
-
+#include <message.h>
 /*
 struct Client
 {
@@ -37,19 +37,21 @@ public:
     ServerInterface(QString user_name);
 //    ~ServerInterface();
     void SendMessage(QString& message, QString& friend_name, QString& user_name);
-    QString ReadMessage(QString& friend_name);
+    QString ReadMessage(QString& friend_name, Message::TypeMessage type_message);
     std::vector<QString> GetAllUsers();
     void BreakConnection();
     QString GetUsersStatus(QString& users);
+    void SendUsername(QString username);
 
 private:
+    std::vector<Message> _messages;
     std::string user_name;
-//    std::vector<Client> clients;
     Server server;
     QString Get_system_info(QString& friend_name, QString& user_name);
     QString GetWhoSend(QString& message);
     void DeleteSystemInfo(QString& message);
-//    void AddNewMessage(std::vector<char>& who_send, std::vector<char>& message);
+    void ParseMessage(QString& message);
+    bool IsMessageDelemiter(int i, QString& str);
 };
 
 std::vector<std::string> _GetAllUsers();

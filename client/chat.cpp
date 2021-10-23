@@ -8,7 +8,7 @@
 #include <iostream>
 
 void Chat::CheckNewMessage(){
-    QString message = server->ReadMessage(friend_name);
+    QString message = server->ReadMessage(friend_name, Message::REGULAR);
     if (!message.isEmpty()){
         AddNewMessage(message, friend_user);
     }

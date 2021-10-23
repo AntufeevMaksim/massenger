@@ -30,6 +30,7 @@ void Message::ParseRegularMessage(QString& message){
         who_send.push_back(c);
         i++;
     }
+    _text = message;
 }
 
 QString Message::GetFriendName(){
