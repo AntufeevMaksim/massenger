@@ -12,21 +12,15 @@
 #include <vector>
 #include <fcntl.h>
 #include <algorithm>
-
 struct Client
 {
   std::vector<char> name;
   int connection;
 };
-
-
 struct SystemInfo{
   std::vector<char> who_send;
   std::vector<char> whom_send;
 };
-
-
-
 SystemInfo GetSystemInfo(std::vector<char>& message){
   std::vector<char> buf;
   int i = 0;
@@ -52,21 +46,15 @@ SystemInfo GetSystemInfo(std::vector<char>& message){
   }
   return system_info;
 }
-
-
-
 std::vector<char> Read(int s){
   fd_set readfs;
   FD_ZERO(&readfs);
   FD_SET(s, &readfs);
-
   struct timeval tv;
   tv.tv_sec = 1;
   tv.tv_usec = 100;
-
   int n;
   unsigned int m;
-
   int res = select(s+1, &readfs, NULL, NULL, &tv);
 //  int rc = recv(s, buf.data(), 3, 0);
   if (res>0){
@@ -79,14 +67,11 @@ std::vector<char> Read(int s){
     return {};
   }
 }
-
 void Send(int sock, std::vector<char> buf){
   if (!buf.empty()){
     send(sock, buf.data(), buf.size(), 0);
   }
 }
-
-
 int WhomSend(std::vector<char>& message, std::vector<Client>& clients){
   SystemInfo message_info = GetSystemInfo(message);
   for (Client client : clients){
@@ -95,7 +80,6 @@ int WhomSend(std::vector<char>& message, std::vector<Client>& clients){
     }
   }
 }
-
 void PreparationForSending(std::vector<char>& message){
 //  int number_separators = 0;
   int i = 0;
@@ -110,8 +94,6 @@ void PreparationForSending(std::vector<char>& message){
     i++;
     }
 }
-
-
 void DeleteOldConnection(std::vector<Client>& clients, std::vector<char>& name){
   for (int i = 0;i<clients.size();i++){
     if (clients[i].name == name){
@@ -119,10 +101,6 @@ void DeleteOldConnection(std::vector<Client>& clients, std::vector<char>& name){
     }
   }
 }
-
-
-
-
 void AddNewConnection(int socket, std::vector<Client>& clients){
 //  int connection = fcntl(socket, F_GETFD, O_NONBLOCK);
   int connection = accept(socket, NULL, NULL);
@@ -135,32 +113,21 @@ void AddNewConnection(int socket, std::vector<Client>& clients){
     clients.push_back(client);
   }
 }
-
-
 //void Send(std::vector<char>& message, std::vector<Client>& clients);
-
-
-
 int main(){
   using namespace std::chrono_literals;
   struct sockaddr_in local;
-
-
   local.sin_family = AF_INET;
   local.sin_port = htons(8888);
   local.sin_addr.s_addr = htonl(INADDR_ANY);
-
   int sock = socket( AF_INET, SOCK_STREAM, 0);
   if (sock < 0){
     perror("socket error");
     return 1;
   }
   int opt = 1;
-
   if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof (opt)) == -1)
     perror("setsockopt");
-
-
   int rc = bind(sock, (struct sockaddr*)&local, sizeof(local));
   if (rc<0){
     perror("error bind");
@@ -173,9 +140,6 @@ int main(){
     return 1;
   }
   fcntl(sock, F_SETFL, O_NONBLOCK);
-
-
-
   std::vector<Client> clients;
 //  std::vector<std::vector<char>> messages;
   while (true)
@@ -193,7 +157,6 @@ int main(){
       //   Send(message, clients);
       // }
     }
-
   }
 }
 */
