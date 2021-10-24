@@ -1,7 +1,7 @@
 #include "server.h"
 #include "fstream"
 #include "message.h"
-
+#include "workwithdatafile.h"
 Server::Server(){
 //  connection = Connection();
 }
@@ -12,10 +12,12 @@ void Server::Next(){
     std::string str_message = connection.Read(client.connection);
     if (!str_message.empty()){
       for (Message message : GetMessages(str_message, client.connection)){
+        /*
         std::fstream file("log", std::ios::app);
         file << str_message;
         file << "\n";
         file.close();
+        */
 //        Message message(str_message, client.connection); /*= ParseMessage(str_message, client.connection);*/
         Send(message);
       }
@@ -45,14 +47,7 @@ if (message.GetType() == Message::BROKE_CONNECTION){
 }
 
 if (message.GetType() == Message::GET_ALL_USERS){
-    std::string users{'g'};
-    std::string line;
-    std::fstream file("users");
-    while(getline(file, line)){
-      users += line += "\n";
-    }
-    users += "#?#";
-    file.close();
+    std::string users = WorkWithDataFile::GetAllUsers();
     connection.Send(message.GetWhoSendSock(), users);
 }
 
@@ -73,7 +68,6 @@ if (message.GetType() == Message::GET_USERS_STATUS){
         name += c;
       }
     }
-    answer += "#?#";
     connection.Send(message.GetWhoSendSock(), answer);
 }
 
@@ -86,7 +80,9 @@ if (message.GetType() == Message::SET_USER_NAME){
 void Server::SetUserName(Message& message){
   for (Client& client : clients){
     if(client.connection == message.GetWhoSendSock()){
-      client.name = message.GetText();
+      std::string new_name{message.GetText()};
+      WorkWithDataFile::SetUserName(new_name, client.name);
+      client.name = new_name;
     }
   }
 }

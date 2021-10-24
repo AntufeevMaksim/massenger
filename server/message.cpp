@@ -79,7 +79,6 @@ std::string Message::Formation(){
     for (char c : _text){
       ready_message.push_back(c);
     }
-    ready_message += "#?#";
   }
   return ready_message;  
 }

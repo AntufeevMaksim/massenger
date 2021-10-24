@@ -69,6 +69,7 @@ void Connection::Send(int s, std::vector<char>& buf){
 
 void Connection::Send(int s, std::string& buf){
   if (!buf.empty()){
+    buf += "#?#";
     send(s, buf.c_str(), buf.size(), 0);
   }
 }
