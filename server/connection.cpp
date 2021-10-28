@@ -54,7 +54,12 @@ std::string Connection::Read(int s ){
     ioctl(s, TIOCINQ, &n);
     std::vector<char> buf(n);
     int rc = recv(s, buf.data(), n, 0);
-    return (rc <= 0 ? std::string{} : std::string{buf.data()});
+    if(rc>0){
+      std::string answer {buf.data()};
+      answer.erase(answer.begin()+buf.size(), answer.end());
+      return answer;
+    }
+    return {};
   }
   else{
     return {};

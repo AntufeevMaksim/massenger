@@ -1,7 +1,7 @@
 #include "server.h"
 #include "fstream"
-#include "message.h"
 #include "workwithdatafile.h"
+#include "message/message.h"
 Server::Server(){
 //  connection = Connection();
 }
@@ -10,39 +10,52 @@ void Server::Next(){
   AddNewConnection();
   for (Client client : clients){
     std::string str_message = connection.Read(client.connection);
+    std::fstream file("log", std::ios::app);
+    file << str_message;
+    file << "\n--------------\n";
+    file.close();
     if (!str_message.empty()){
-      for (Message message : GetMessages(str_message, client.connection)){
+      std::vector<std::string> messages = GetMessages(str_message);
+      if(str_message.find("XUUU") != std::string::npos){
+        printf("%s", str_message.c_str());
+      }
+      for (std::string& str_message : messages){
+//        std::unique_ptr<Message> message;
+//        message.reset(Message::New(str_message, client.connection, this));
+        Message* message = Message::New(str_message, client.connection, this);
+        message->Send();
+        delete message;
         /*
         std::fstream file("log", std::ios::app);
         file << str_message;
         file << "\n";
         file.close();
         */
-//        Message message(str_message, client.connection); /*= ParseMessage(str_message, client.connection);*/
-        Send(message);
+//        Send(message);
       }
     }
   }
 }
 
 
-
+/*
 void Server::Send(Message& message){
 
 if (message.GetType() == Message::REGULAR){
     std::string who_send = message.GetWhomSend();
+    std::string whom_send = message.GetWhomSend();
     Client client = FindUser(who_send);
-    std::string ready_message = message.Formation()/*MessageFormation(message)*/;
-    connection.Send(client.connection, ready_message);
+    std::string ready_message = message.Formation();
+
+    if(IsActiveUser(whom_send)){
+      connection.Send(client.connection, ready_message);
+    }
+    else{
+      WorkWithDataFile::AddMessage(whom_send, message.GetText())
+    }
 }
   
 if (message.GetType() == Message::BROKE_CONNECTION){
-    /*
-    std::string who_send = message.GetWhomSend();
-    Client client = FindUser(who_send);
-    std::string ready_message = message.Formation();
-    connection.Send(client.connection, ready_message);
-    */
    BrokeOldConnection(message.GetWhoSendSock());
 }
 
@@ -76,15 +89,19 @@ if (message.GetType() == Message::SET_USER_NAME){
 }
 
 }
+*/
 
-void Server::SetUserName(Message& message){
+void Server::SetUserName(int sock, std::string& name){
   for (Client& client : clients){
-    if(client.connection == message.GetWhoSendSock()){
-      std::string new_name{message.GetText()};
-      WorkWithDataFile::SetUserName(new_name, client.name);
-      client.name = new_name;
+    if(client.connection == sock){
+      WorkWithDataFile::SetUserName(name, client.name);
+      client.name = name;
     }
   }
+}
+
+void Server::Send(int sock, std::string& message){
+  connection.Send(sock, message);
 }
 
 Client Server::FindUser(std::string& name){
@@ -99,19 +116,6 @@ Client Server::FindUser(std::string& name){
 void Server::AddNewConnection(){
   int connect = connection.accept_new_connection();
   if (connect > 0){
-/*    std::string name = connection.Read(connect);
-    
-    std::fstream file("log", std::ios::app);
-    if (name.empty()){
-      file << "empty name \n";
-    }
-    else{
-       file << name.data();
-       file << "\n";
-    }
-    file.close();
-    
-*/
     Client client;
     client.connection = connect;
     clients.push_back(client);
@@ -119,8 +123,7 @@ void Server::AddNewConnection(){
 }
 
 
-void Server::BrokeOldConnection(int sock){
-
+void Server::BrokeConnection(int sock){
   for (size_t i=0; i<clients.size(); i++){
     if (clients[i].connection == sock){
       clients.erase(clients.begin()+i);
@@ -129,6 +132,7 @@ void Server::BrokeOldConnection(int sock){
   }
 }
 
+/*
 bool Server::IsActiveUser(std::string& name){
   for (Client client : clients){
     if (client.name == name){
@@ -138,22 +142,37 @@ bool Server::IsActiveUser(std::string& name){
   return false;
 }
 
+*/
 
-std::vector<Message> Server::GetMessages(std::string& str_message, int who_send_sock){
-  std::vector<Message> messages;
-  std::string message;
+std::vector<std::string> Server::GetOnlineUsersNames(){
+  std::vector<std::string> names;
+  for(Client& client : clients){
+    names.push_back(client.name);
+  }
+  return names;
+}
+
+
+
+
+
+
+std::vector<std::string> Server::GetMessages(const std::string& message){
+  std::vector<std::string> messages;
   int last_delemiter = 0;
-  for (size_t i = 0; i < str_message.size()-2; i++)
+  for (size_t i = 0; i < message.size()-2; i++)
   {
-    if (IsMessageDelemiter(i, str_message)){
-      messages.push_back(Message(str_message.substr(last_delemiter, i-last_delemiter), who_send_sock));
+    if (IsMessageDelemiter(i, message)){
+//      auto message = std::make_unique<Message>(str_message.substr(last_delemiter, i-last_delemiter), who_send_sock);
+//      messages.push_back(std::move(message));
+      messages.push_back(message.substr(last_delemiter, i-last_delemiter));
       last_delemiter = i + 3;
     }
   }
   return messages;
 }
 
-bool Server::IsMessageDelemiter(int i, std::string& str){
-  return str[i] == '#' && str[i+1] == '?' && str[i+2] == '#';
 
+bool Server::IsMessageDelemiter(int i, const std::string& str){
+  return str[i] == '#' && str[i+1] == '?' && str[i+2] == '#';
 }
