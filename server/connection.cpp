@@ -55,8 +55,8 @@ std::string Connection::Read(int s ){
     std::vector<char> buf(n);
     int rc = recv(s, buf.data(), n, 0);
     if(rc>0){
-      std::string answer {buf.data()};
-      answer.erase(answer.begin()+buf.size(), answer.end());
+      std::string answer;
+      std::copy(buf.begin(), buf.end(),  std::back_inserter(answer));
       return answer;
     }
     return {};

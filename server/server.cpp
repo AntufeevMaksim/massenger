@@ -10,11 +10,11 @@ void Server::Next(){
   AddNewConnection();
   for (Client client : clients){
     std::string str_message = connection.Read(client.connection);
+    if (!str_message.empty()){
     std::fstream file("log", std::ios::app);
     file << str_message;
     file << "\n--------------\n";
     file.close();
-    if (!str_message.empty()){
       std::vector<std::string> messages = GetMessages(str_message);
       if(str_message.find("XUUU") != std::string::npos){
         printf("%s", str_message.c_str());
