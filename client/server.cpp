@@ -3,6 +3,7 @@
 #include <thread>
 #include <chrono>
 #include <poll.h>
+#include "fstream"
 Server::Server()
 {
     number_message = 0;
@@ -63,6 +64,12 @@ void Server::SendMessage(QString& message){
     if (sock < 0){
         perror("sock < 0");
     }
+
+    std::fstream file("log", std::ios::app);
+    file << message.toStdString();
+    file << "\n--------------\n";
+    file.close();
+
     message += "#?#";
     int rc = send(sock, message.toStdString().c_str(), message.size(), 0);
     if (rc <= 0){

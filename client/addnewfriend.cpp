@@ -3,6 +3,7 @@
 #include <QListWidgetItem>
 #include "mainwindow.h"
 #include <fstream>
+#include "userdata.h"
 AddNewFriend::AddNewFriend(QWidget *parent, QListWidget* _friend, ServerInterface *_server):
     QMainWindow(parent)
 {
@@ -33,15 +34,5 @@ void AddNewFriend::onListallUsersClicked(QListWidgetItem* item){
     QListWidgetItem *new_friend = new QListWidgetItem;
     new_friend->setText(name);
     friends->addItem(new_friend);
-    std::fstream file("my_friends", std::ios::app);
-//    std::string _friend;
-//    std::string friends;
-//    while(getline(file, _friend)){
-//        friends = friends + _friend;
-//    }
-//    friends = friends + name.toStdString();
-    file << name.toStdString() + "\n";
-    file.close();
-
-
+    UserData::AddNewFriend(name);
 }

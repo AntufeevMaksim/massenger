@@ -3,6 +3,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include "serverinterface.h"
+#include "userdata.h"
 #include <thread>
 #include <chrono>
 #include <iostream>
@@ -22,7 +23,7 @@ void Chat::AddNewMessage(QString& text, userType user_type){
         new_message->setBackground(Qt::green);
     }
     ui->user_chat->addItem(new_message);
-
+//    UserData::AddNewMessage(user_name, text);  //here
 
 }
 

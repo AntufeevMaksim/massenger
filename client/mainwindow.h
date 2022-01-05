@@ -11,6 +11,8 @@
 #include "ui_addnewfriend.h"
 #include <QCloseEvent>
 #include <QTimer>
+#include <setusername.h>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow;}
 QT_END_NAMESPACE
@@ -26,14 +28,15 @@ private slots:
     void onListMailItemClicked(QListWidgetItem* item);
     void onListMailItemDoubleClicked(QListWidgetItem* item);
     void on_actionAdd_user_triggered();
+    void on_actionSet_username_triggered();
     void CheckFriendsStatus();
 
 private:
     void closeEvent(QCloseEvent *event);
-    void LoadListFriends();
     std::unique_ptr<Ui::MainWindow> ui = std::make_unique<Ui::MainWindow>();
     std::unique_ptr<AddNewFriend> add_new_friend_window;
     std::unique_ptr<Chat> user_chat;
+    std::unique_ptr<SetUsername> set_username;
     ServerInterface server;
     QString user_name;
     Chat chat;
