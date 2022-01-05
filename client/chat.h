@@ -5,6 +5,7 @@
 #include "serverinterface.h"
 #include "ui_chat.h"
 #include <QTimer>
+#include "usertype.h"
 
 namespace Ui {
 class Chat;
@@ -23,11 +24,7 @@ private slots:
     void CheckNewMessage();
 
 private:
-    enum userType{
-        this_user,
-        friend_user
-    };
-    void AddNewMessage(QString& text, userType user_type);
+    void AddNewMessage(QString& text, UserType user_type);
     QString user_name;
     QString friend_name;
     ServerInterface *server;

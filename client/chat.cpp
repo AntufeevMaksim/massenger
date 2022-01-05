@@ -16,14 +16,14 @@ void Chat::CheckNewMessage(){
 }
 
 
-void Chat::AddNewMessage(QString& text, userType user_type){
+void Chat::AddNewMessage(QString& text, UserType user_type){
     QListWidgetItem *new_message = new QListWidgetItem;
     new_message->setText(text);
     if (user_type == this_user){
         new_message->setBackground(Qt::green);
     }
     ui->user_chat->addItem(new_message);
-//    UserData::AddNewMessage(user_name, text);  //here
+    UserData::AddNewMessage(friend_name, text, user_type);  //here
 
 }
 
@@ -42,6 +42,7 @@ Chat::Chat(QWidget *parent, QString& _user_name, QString& _friend_name, ServerIn
 //    server = ServerInterface(user_name);
 //    QTimer *timer = new QTimer(this);
     connect(&check_new_message, SIGNAL(timeout()), this, SLOT(CheckNewMessage()));
+    UserData::LoadChatHistory(ui->user_chat, friend_name);
     check_new_message.start(1000);
 }
 

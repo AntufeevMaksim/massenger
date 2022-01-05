@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <rapidjson/prettywriter.h>
 #include <cstring>
+
 void UserData::LoadListFriends(QListWidget& users){
     using namespace rapidjson;
     std::ifstream ifs { R"(userdata.json)" };
@@ -28,7 +29,7 @@ void UserData::LoadListFriends(QListWidget& users){
 
     for (SizeType i = 0; i < friends.Size(); i++){
         QListWidgetItem *user = new QListWidgetItem();
-        user->setText(friends[i].GetString());
+        user->setText(friends[i][0].GetString());
         users.addItem(user);
     }
     ifs.close();
@@ -48,7 +49,7 @@ void UserData::DeleteFriend(QListWidget &users, QListWidgetItem &user){
     Value& friends = doc["my_friends"];
 
     for (SizeType i = 0; i < friends.Size(); i++){
-        if(!std::strcmp(friends[i].GetString(), user.text().toStdString().c_str())){
+        if(!std::strcmp(friends[i][0].GetString(), user.text().toStdString().c_str())){
             friends.Erase(friends.Begin() + i);
         }
     }
@@ -113,7 +114,7 @@ void UserData::SetUsername(QString &username){
 }
 
 
-void UserData::AddNewFriend(QString &name){
+void UserData::AddNewFriend(QString &str_name){
     using namespace rapidjson;
 
     Document doc;
@@ -124,10 +125,13 @@ void UserData::AddNewFriend(QString &name){
     doc.ParseStream( isw );
     ifs.close();
 
-    Value friend_name;
-    friend_name.SetString(name.toStdString().c_str(), name.size());
+    Value friend_;
+    friend_.SetArray();
+    Value name;
+    name.SetString(str_name.toStdString().c_str(), str_name.size());
+    friend_.PushBack(name, doc.GetAllocator());
 
-    doc["my_friends"].PushBack(friend_name, doc.GetAllocator());
+    doc["my_friends"].PushBack(friend_, doc.GetAllocator());
 
     FILE* fp = fopen("userdata.json", "w"); // non-Windows use "w"
 
@@ -141,7 +145,7 @@ void UserData::AddNewFriend(QString &name){
 }
 
 
-void UserData::AddNewMessage(QString &username, QString &string_message){
+void UserData::AddNewMessage(QString &username, QString string_message, UserType& user_type){
     using namespace rapidjson;
     Document doc;
     std::ifstream ifs { R"(userdata.json)" };
@@ -151,10 +155,31 @@ void UserData::AddNewMessage(QString &username, QString &string_message){
     doc.ParseStream( isw );
     ifs.close();
 
+    std::string ready_message(string_message.toStdString().c_str());
+
+    if(user_type == this_user)
+        ready_message = "u" + ready_message;
+    else{
+        ready_message = "f" + ready_message;
+    }
+
+//    std::string ready_message(string_message.toStdString().c_str());
+    std::string _whom_send(username.toStdString().c_str());
+
+    Value& users = doc["my_friends"];
     Value message;
-    message.SetString(string_message.toStdString().c_str(), string_message.size());
+    message.SetString(ready_message.c_str(), ready_message.size());
 
-    doc["my_friends"][username.toStdString().c_str()].PushBack(message, doc.GetAllocator());
+//    bool this_new_user = true;
+    for (SizeType i = 0; i < users.Size(); i++){
+//      if (!std::strcmp(users[i][0].GetString(), old_name.c_str()) || !std::strcmp(users[i][0].GetString(), new_name.c_str())){
+      if(!std::strcmp(users[i][0].GetString(), _whom_send.c_str())){
+//        users[i][0] = name;
+        users[i].PushBack(message, doc.GetAllocator());
+//        this_new_user = false;
+        break;
+      }
+    }
 
     FILE* fp = fopen("userdata.json", "w"); // non-Windows use "w"
 
@@ -167,27 +192,42 @@ void UserData::AddNewMessage(QString &username, QString &string_message){
     fclose(fp);
 }
 
+void UserData::LoadChatHistory(QListWidget *chat, QString &username){
+
+    using namespace rapidjson;
+    Document doc;
+    std::ifstream ifs { R"(userdata.json)" };
+
+    IStreamWrapper isw { ifs };
+
+    doc.ParseStream( isw );
+    ifs.close();
+
+    Value& users = doc["my_friends"];
+
+    for (SizeType i = 0; i < users.Size(); i++){
+        if(!std::strcmp(users[i][0].GetString(), username.toStdString().c_str())){
+            for (SizeType i2 = 1; i2 < users[i].Size(); i2++){
+                QListWidgetItem *message = new QListWidgetItem;
+                QString text = users[i][i2].GetString();
+                text.remove(0,1);
+                message->setText(text.toStdString().c_str());
+                if(users[i][i2].GetString()[0] == 'u'){
+                    message->setBackground(Qt::green);
+                }
+                chat->addItem(message);
+            }
+        }
+    }
 
 
+    FILE* fp = fopen("userdata.json", "w"); // non-Windows use "w"
 
+    char buffer[1024];
+    FileWriteStream os(fp, buffer, sizeof(buffer));
 
+    Writer<FileWriteStream> writer(os);
+    doc.Accept(writer);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    fclose(fp);
+}
