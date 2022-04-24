@@ -164,7 +164,6 @@ int main(){
 #include "server.h"
 #include <thread>
 #include <chrono>
-#include <poll.h>
 
 int main(){
   using namespace std::chrono_literals;

@@ -41,7 +41,7 @@ void WorkWithDataFile::SetUserName(std::string& new_name, std::string& old_name)
     }
 
 
-    FILE* fp = fopen("data.json", "w"); // non-Windows use "w"
+    FILE* fp = fopen("data.json", "w");
 
     char buffer[1024];
     FileWriteStream os(fp, buffer, sizeof(buffer));
@@ -73,5 +73,85 @@ std::string WorkWithDataFile::GetAllUsers(){
     }
 
     return all_users;
+
+}
+
+
+void WorkWithDataFile::SaveMessageForOfflineUser(std::string& _whom_send, std::string& ready_message){
+
+    using namespace rapidjson;
+    Document doc;
+    std::ifstream ifs { R"(data.json)" };
+
+    IStreamWrapper isw { ifs };
+
+    doc.ParseStream( isw );
+    ifs.close();
+
+
+    Value& users = doc["users"];
+    Value message;
+    message.SetString(ready_message.c_str(), ready_message.size());
+
+//    bool this_new_user = true;
+    for (SizeType i = 0; i < users.Size(); i++){
+//      if (!std::strcmp(users[i][0].GetString(), old_name.c_str()) || !std::strcmp(users[i][0].GetString(), new_name.c_str())){
+      if(!std::strcmp(users[i][0].GetString(), _whom_send.c_str())){
+//        users[i][0] = name;
+        users[i].PushBack(message, doc.GetAllocator());
+//        this_new_user = false;
+        break;
+      }
+    }
+    FILE* fp = fopen("data.json", "w");
+
+    char buffer[1024];
+    FileWriteStream os(fp, buffer, sizeof(buffer));
+
+    Writer<FileWriteStream> writer(os);
+    doc.Accept(writer);
+
+    fclose(fp);
+
+}
+
+
+
+std::vector<std::string> WorkWithDataFile::GetSavedMessages(std::string& name){
+    using namespace rapidjson;
+    Document doc;
+    std::ifstream ifs { R"(data.json)" };
+
+    IStreamWrapper isw { ifs };
+
+    doc.ParseStream( isw );
+    ifs.close();
+
+    Value& users = doc["users"];
+
+    std::vector<std::string> saved_messages;
+
+    for (SizeType i = 0; i < users.Size(); i++){
+      if(!std::strcmp(users[i][0].GetString(), name.c_str())){
+        size_t size = users[i].Size();
+        for (SizeType index = 1; index < size; index++){
+          saved_messages.push_back(std::string(users[i][1].GetString()));
+          users[i].Erase(users[i].Begin()+1);
+        }
+        break;
+      }
+    }
+
+   FILE* fp = fopen("data.json", "w");
+
+    char buffer[1024];
+    FileWriteStream os(fp, buffer, sizeof(buffer));
+
+    Writer<FileWriteStream> writer(os);
+    doc.Accept(writer);
+
+    fclose(fp);
+
+  return saved_messages;
 
 }

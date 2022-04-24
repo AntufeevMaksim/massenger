@@ -1,10 +1,4 @@
 #include "connection.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <stdio.h>
 
 Connection::Connection(){
   Connect();
@@ -75,7 +69,12 @@ void Connection::Send(int s, std::vector<char>& buf){
 void Connection::Send(int s, std::string& buf){
   if (!buf.empty()){
     buf += "#?#";
-    send(s, buf.c_str(), buf.size(), 0);
+    try{
+      send(s, buf.c_str(), buf.size(), 0);
+    }
+    catch(const std::exception& e){
+      printf("exception");
+    }
   }
 }
 
