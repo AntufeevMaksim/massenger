@@ -1,12 +1,4 @@
 #include "mainwindow.h"
-#include "addnewfriend.h"
-#include "serverinterface.h"
-#include <stdio.h>
-#include <QObject>
-#include "chat.h"
-#include <fstream>
-#include <algorithm>
-#include "setusername.h"
 #include "userdata.h"
 
 void MainWindow::on_actionSet_username_triggered(){
@@ -24,22 +16,6 @@ void MainWindow::onListMailItemClicked(QListWidgetItem *item)
 }
 
 void MainWindow::onListMailItemDoubleClicked(QListWidgetItem *item){
-    /*
-    std::string name;
-    std::vector<std::string> friends;
-    std::fstream file("my_friends", file.out);
-    for (int i = 0; i < ui->friends->count(); i++) {
-        friends.push_back(ui->friends->item(i)->text().toStdString());
-    }
-    auto i = std::remove(friends.begin(), friends.end(), item->text().toStdString());
-    friends.erase(i, friends.end());
-
-    for(std::string name : friends){
-        file << name + "\n";
-    }
-    file.close();
-    delete ui->friends->takeItem(ui->friends->row(item));
-*/
     UserData::DeleteFriend(*(ui->friends), *item);
 }
 
@@ -70,10 +46,7 @@ void MainWindow::CheckFriendsStatus(){
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-//    user_name = "test_user_name";
-//    user_name = "Maksim";
     user_name = UserData::LoadUsername();
-//    user_name = "Ne Maksim";
     ui->setupUi(this);
     UserData::LoadListFriends(*(ui->friends));
     connect(ui->friends, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
@@ -91,14 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-//QListWidgetItem *newItem = new QListWidgetItem;
-//newItem->setText("newitem");
-//connect(ui->Friends, SIGNAL(itemClicked(QListWidgetItem*)),
-//            this, SLOT(onListMailItemClicked(QListWidgetItem*)));
-//
-//ui->Friends->insertItem(1, newItem);
-
-
 void MainWindow::on_actionAdd_user_triggered()
 {
     add_new_friend_window.reset(new AddNewFriend(0, ui->friends, &server));
@@ -106,7 +71,7 @@ void MainWindow::on_actionAdd_user_triggered()
 }
 
 
-void MainWindow::closeEvent(QCloseEvent*/*event*/){
+void MainWindow::closeEvent(QCloseEvent*){
     server.BreakConnection();
 }
 

@@ -1,8 +1,4 @@
 #include "server.h"
-#include "stdio.h"
-#include <thread>
-#include <chrono>
-#include <poll.h>
 #include "fstream"
 Server::Server()
 {
@@ -43,7 +39,6 @@ QString Server::ReadMessage(){
     int n;
 
     int res = select(sock+1, &readfs, NULL, NULL, &tv);
-  //  int rc = recv(s, buf.data(), 3, 0);
     if (res>0){
       ioctl(sock, TIOCINQ, &n);
       std::vector<char> buf(n);

@@ -2,9 +2,9 @@
 #define SETUSERNAME_H
 
 #include <QMainWindow>
-#include <memory>
 #include "ui_setusername.h"
 #include "serverinterface.h"
+
 namespace Ui {
 class SetUsername;
 }

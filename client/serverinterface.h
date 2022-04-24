@@ -11,22 +11,6 @@
 #include <server.h>
 #include <QObject>
 #include <message.h>
-/*
-struct Client
-{
-private:
-    std::vector<char> _name;
-    std::vector<char> _message;
-
-public:
-    Client(std::vector<char>& name, std::vector<char>& message);
-    std::vector<char> GetName();
-    std::vector<char> GetMessage();
-    void ClearMessage();
-    void AddMessage(std::vector<char>& message);
-};
-*/
-
 
 
 class ServerInterface
@@ -35,7 +19,6 @@ class ServerInterface
 public:
     ServerInterface();
     ServerInterface(QString user_name);
-//    ~ServerInterface();
     void SendMessage(QString& message, QString& friend_name, QString& user_name);
     QString ReadMessage(QString& friend_name, Message::TypeMessage type_message);
     std::vector<QString> GetAllUsers();

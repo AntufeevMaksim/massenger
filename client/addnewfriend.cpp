@@ -1,8 +1,5 @@
 #include "addnewfriend.h"
 #include "serverinterface.h"
-#include <QListWidgetItem>
-#include "mainwindow.h"
-#include <fstream>
 #include "userdata.h"
 AddNewFriend::AddNewFriend(QWidget *parent, QListWidget* _friend, ServerInterface *_server):
     QMainWindow(parent)

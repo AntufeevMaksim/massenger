@@ -1,12 +1,5 @@
 #include "chat.h"
-
-#include <QListWidget>
-#include <QListWidgetItem>
-#include "serverinterface.h"
 #include "userdata.h"
-#include <thread>
-#include <chrono>
-#include <iostream>
 
 void Chat::CheckNewMessage(){
     QString message = server->ReadMessage(friend_name, Message::REGULAR);
@@ -23,7 +16,7 @@ void Chat::AddNewMessage(QString& text, UserType user_type){
         new_message->setBackground(Qt::green);
     }
     ui->user_chat->addItem(new_message);
-    UserData::AddNewMessage(friend_name, text, user_type);  //here
+    UserData::AddNewMessage(friend_name, text, user_type);
 
 }
 
@@ -39,8 +32,6 @@ Chat::Chat(QWidget *parent, QString& _user_name, QString& _friend_name, ServerIn
     user_name = _user_name;
     friend_name = _friend_name;
     server = _server;
-//    server = ServerInterface(user_name);
-//    QTimer *timer = new QTimer(this);
     connect(&check_new_message, SIGNAL(timeout()), this, SLOT(CheckNewMessage()));
     UserData::LoadChatHistory(ui->user_chat, friend_name);
     check_new_message.start(1000);

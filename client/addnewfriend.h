@@ -3,9 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidget>
-//#include <mainwindow.h>
 #include "ui_addnewfriend.h"
-#include <memory>
 #include "serverinterface.h"
 
 namespace Ui {
