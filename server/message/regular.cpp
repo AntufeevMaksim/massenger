@@ -1,7 +1,7 @@
 #include "regular.h"
 #include "server.h"
 #include "client.h"
-
+#include "workwithdatafile.h"
 void Regular::Parse(std::string& message){
   message.erase(message.begin());
   int i = 0;
@@ -46,5 +46,10 @@ Regular::Regular(std::string message, int who_send_sock, Server *server){
 void Regular::Send(){
   std::string ready_message = Formation();
   Client client = _server->FindUser(_whom_send);
-  _server->Send(client.connection, ready_message);
+  if (client.name == "&*^%Not&Found"){
+    WorkWithDataFile::SaveMessageForOfflineUser(_whom_send, ready_message);
+  }
+  else{
+    _server->Send(client.connection, ready_message);
+  }
 }

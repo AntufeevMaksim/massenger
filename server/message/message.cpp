@@ -32,6 +32,7 @@ Message* Message::New(std::string message, int who_send_sock, Server *server){
   case 'n':
     return new SetUserName(message, who_send_sock, server);
     break;
+
   default:
     std::__throw_invalid_argument(message.c_str());
     break;
