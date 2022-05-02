@@ -9,7 +9,6 @@
 class Message
 {
   public:
-    static Message* New(std::string message, int who_send_sock, Server *server);
     virtual ~Message();
     virtual void Send();
   protected:
