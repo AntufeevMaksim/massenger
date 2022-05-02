@@ -1,6 +1,6 @@
 #include "server.h"
 #include "workwithdatafile.h"
-#include "message/message.h"
+#include "message/message_creator.h"
 Server::Server(){
 }
 
@@ -11,7 +11,7 @@ void Server::Next(){
     if (!str_message.empty()){
       std::vector<std::string> messages = GetMessages(str_message);
       for (std::string& str_message : messages){
-        Message* message = Message::New(str_message, client.connection, this);
+        Message* message = MessageCreator::New(str_message, client.connection, this);
         message->Send();
         delete message;
       }
@@ -23,7 +23,6 @@ void Server::SetUserName(int sock, std::string& name){
   for (Client& client : clients){
     if(client.connection == sock){
       WorkWithDataFile::SetUserName(name, client.name);
-      UsernameChangedMessage(client.name, name);
       client.name = name;
     }
   }
@@ -31,14 +30,6 @@ void Server::SetUserName(int sock, std::string& name){
   
 }
 
-void Server::UsernameChangedMessage(std::string& old_name, std::string& new_name){
-  std::string message = 'c' + old_name + "&^%(~%" + new_name;
-  for (Client client : clients){
-    Send(client.connection, message);
-  }
-
-
-}
 
 
 void Server::SendSavedMessages(int sock, std::string& name){
@@ -61,7 +52,7 @@ Client Server::FindUser(std::string& name){
     }
   }
   Client client;
-  client.name = "&*^%Not&Found";
+  client.name = "&*^%Not&Found"; 
   return client;
 }
 

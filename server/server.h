@@ -15,7 +15,6 @@ private:
   std::vector<std::string> GetMessages(const std::string& message);
   bool IsMessageDelemiter(int i, const std::string& str);
   void SendSavedMessages(int sock, std::string& name);
-  void UsernameChangedMessage(std::string& old_name, std::string& new_name);
 public:
   Server();
   void Next();

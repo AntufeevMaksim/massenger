@@ -93,13 +93,9 @@ void WorkWithDataFile::SaveMessageForOfflineUser(std::string& _whom_send, std::s
     Value message;
     message.SetString(ready_message.c_str(), ready_message.size());
 
-//    bool this_new_user = true;
     for (SizeType i = 0; i < users.Size(); i++){
-//      if (!std::strcmp(users[i][0].GetString(), old_name.c_str()) || !std::strcmp(users[i][0].GetString(), new_name.c_str())){
       if(!std::strcmp(users[i][0].GetString(), _whom_send.c_str())){
-//        users[i][0] = name;
         users[i].PushBack(message, doc.GetAllocator());
-//        this_new_user = false;
         break;
       }
     }

@@ -43,7 +43,6 @@ std::string Connection::Read(int s ){
   int n;
 
   int res = select(s+1, &readfs, NULL, NULL, &tv);
-//  int rc = recv(s, buf.data(), 3, 0);
   if (res>0){
     ioctl(s, TIOCINQ, &n);
     std::vector<char> buf(n);
