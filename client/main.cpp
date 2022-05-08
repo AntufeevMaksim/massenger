@@ -1,11 +1,12 @@
-#include "mainwindow.h"
+#include "server.h"
+#include <thread>
+#include <chrono>
 
-#include <QApplication>
-
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    return a.exec();
+int main(){
+  using namespace std::chrono_literals;
+  Server server;
+  while (true){
+    std::this_thread::sleep_for(100ms);
+    server.Next();
+  }
 }
