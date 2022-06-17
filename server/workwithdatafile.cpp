@@ -1,11 +1,12 @@
 #include "workwithdatafile.h"
-#include <rapidjson/document.h>
+
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/filewritestream.h>
 #include "rapidjson/filereadstream.h"
+
 #include <fstream>
 #include <cstring>
 void WorkWithDataFile::SetUserName(std::string& new_name, std::string& old_name){
@@ -29,15 +30,16 @@ void WorkWithDataFile::SetUserName(std::string& new_name, std::string& old_name)
 
     bool this_new_user = true;
     for (SizeType i = 0; i < users.Size(); i++){
-      if (!std::strcmp(users[i][0].GetString(), old_name.c_str()) || !std::strcmp(users[i][0].GetString(), new_name.c_str())){
-        users[i][0] = name;
+      if (!std::strcmp(users[i]["name"].GetString(), old_name.c_str()) || !std::strcmp(users[i]["name"].GetString(), new_name.c_str())){
+        users[i]["name"] = name;
         this_new_user = false;
         break;
       }
     }
 
     if(this_new_user){
-      users.PushBack(name, doc.GetAllocator());
+      Value new_user = WorkWithDataFile::CreateNewUser(name, doc);
+      users.PushBack(new_user, doc.GetAllocator());
     }
 
 
@@ -68,7 +70,7 @@ std::string WorkWithDataFile::GetAllUsers(){
 
     Value& users = doc["users"];
     for (SizeType i = 0; i < users.Size(); i++){
-      all_users += users[i][0].GetString();
+      all_users += users[i]["name"].GetString();
       all_users += "\n";
     }
 
@@ -94,8 +96,8 @@ void WorkWithDataFile::SaveMessageForOfflineUser(std::string& _whom_send, std::s
     message.SetString(ready_message.c_str(), ready_message.size());
 
     for (SizeType i = 0; i < users.Size(); i++){
-      if(!std::strcmp(users[i][0].GetString(), _whom_send.c_str())){
-        users[i].PushBack(message, doc.GetAllocator());
+      if(!std::strcmp(users[i]["name"].GetString(), _whom_send.c_str())){
+        users[i]["messages_for_him"].PushBack(message, doc.GetAllocator());
         break;
       }
     }
@@ -128,11 +130,10 @@ std::vector<std::string> WorkWithDataFile::GetSavedMessages(std::string& name){
     std::vector<std::string> saved_messages;
 
     for (SizeType i = 0; i < users.Size(); i++){
-      if(!std::strcmp(users[i][0].GetString(), name.c_str())){
-        size_t size = users[i].Size();
-        for (SizeType index = 1; index < size; index++){
-          saved_messages.push_back(std::string(users[i][1].GetString()));
-          users[i].Erase(users[i].Begin()+1);
+      if(!std::strcmp(users[i]["name"].GetString(), name.c_str())){
+        for (size_t n = 0; n < users[i]["messages_for_him"].Size(); n++){
+          saved_messages.push_back(std::string(users[i]["messages_for_him"][n].GetString()));
+          users[i]["messages_for_him"].Erase(users[i]["messages_for_him"].Begin());
         }
         break;
       }
@@ -150,4 +151,21 @@ std::vector<std::string> WorkWithDataFile::GetSavedMessages(std::string& name){
 
   return saved_messages;
 
+}
+
+rapidjson::Value WorkWithDataFile::CreateNewUser(rapidjson::Value& name, rapidjson::Document& doc){
+  using namespace rapidjson;
+  Value new_user(rapidjson::kObjectType);
+
+  new_user.AddMember("name", name, doc.GetAllocator());
+
+  Value id;
+  id.SetInt(0);
+  new_user.AddMember("id", id, doc.GetAllocator());
+
+  Value messages_for_him;
+  messages_for_him.SetArray();
+  new_user.AddMember("messages_for_him", messages_for_him, doc.GetAllocator());
+
+  return new_user;
 }
