@@ -23,6 +23,8 @@ void Regular::Parse(std::string& message){
     i++;
   }
   _text = buf;
+//  _who_send = std::stoi(who_send);
+//  _whom_send = std::stoi(whom_send);
 }
 
 std::string Regular::Formation(){
@@ -45,9 +47,9 @@ Regular::Regular(std::string message, int who_send_sock, Server *server){
 
 void Regular::Send(){
   std::string ready_message = Formation();
-  Client client = _server->FindUser(_whom_send);
+  Client client = _server->FindUser(std::stoi(_whom_send));
   if (client.name == "&*^%Not&Found"){
-    WorkWithDataFile::SaveMessageForOfflineUser(_whom_send, ready_message);
+    WorkWithDataFile::SaveMessageForOfflineUser(std::stoi(_whom_send), ready_message);
   }
   else{
     _server->Send(client.connection, ready_message);

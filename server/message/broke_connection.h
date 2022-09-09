@@ -4,7 +4,6 @@
 #include "message.h"
 
 class BrokeConnection : public Message{
-  std::string _username;
   void Parse();
 
   public:

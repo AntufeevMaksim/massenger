@@ -14,15 +14,16 @@ private:
   void AddNewConnection();
   std::vector<std::string> GetMessages(const std::string& message);
   bool IsMessageDelemiter(int i, const std::string& str);
-  void SendSavedMessages(int sock, std::string& name);
+  void SendSavedMessages(int sock, int user_id);
 public:
   Server();
   void Next();
   void Send(int sock, std::string& message);
-  void SetUserName(int sock, std::string& name);
-  std::vector<std::string> GetOnlineUsersNames();
+  void ChangeUserName(int sock, std::string& name);
+  std::vector<int> GetOnlineUsersId();
   void BrokeConnection(int sock);
-  Client FindUser(std::string& name);
+  Client FindUser(int user_id);
+  void InitializeUser(int sock, int user_id);
 };
 
 #endif // SERVER_H

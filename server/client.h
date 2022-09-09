@@ -8,6 +8,7 @@
 struct Client
 {
   std::string name;
+  int id;
   int connection;
 };
 

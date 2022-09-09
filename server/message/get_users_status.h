@@ -4,7 +4,7 @@
 #include "message.h"
 
 class GetUsersStatus : public Message{
-  std::vector<std::string> _users_names;
+  std::vector<int> _users_id;
   void Parse(std::string& message);
   public:
     GetUsersStatus(std::string message, int sock, Server *server);

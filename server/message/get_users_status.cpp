@@ -2,14 +2,14 @@
 
 void GetUsersStatus::Parse(std::string& message){
   message.erase(message.begin());
-  std::string name;
+  std::string id;
   for (char c : message){
     if (c == '\n'){
-      _users_names.push_back(name);
-      name.clear();
+      _users_id.push_back(atoi(id.c_str()));
+      id.clear();
     }
     else{
-      name += c;
+      id += c;
     }
   }  
 }
@@ -26,12 +26,12 @@ GetUsersStatus::GetUsersStatus(std::string message, int sock, Server *server){
 
 void GetUsersStatus::Send(){
   std::string answer{'s'};
-  std::vector<std::string> online_users = _server->GetOnlineUsersNames();
+  std::vector<int> online_users = _server->GetOnlineUsersId();
 
-  for(std::string& name : _users_names){
+  for(int id : _users_id){
     bool this_user_online = false;
-    for(std::string& online_user : online_users){
-      if(name == online_user){
+    for(int online_user : online_users){
+      if(id == online_user){
         this_user_online = true;
       }
     }

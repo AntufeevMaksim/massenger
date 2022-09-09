@@ -12,5 +12,5 @@ void SetUserName::Parse(std::string& message){
 }
 
 void SetUserName::Send(){
-  _server->SetUserName(_who_send_sock, _user_name);
+  _server->ChangeUserName(_who_send_sock, _user_name);
 }

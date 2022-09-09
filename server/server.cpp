@@ -19,21 +19,39 @@ void Server::Next(){
   }
 }
 
-void Server::SetUserName(int sock, std::string& name){
+void Server::ChangeUserName(int sock, std::string& name){
   for (Client& client : clients){
     if(client.connection == sock){
-      WorkWithDataFile::SetUserName(name, client.name);
+      WorkWithDataFile::ChangeUserName(client.id, name);
       client.name = name;
+      break;
+    }
+  }  
+}
+
+void Server::InitializeUser(int sock, int user_id){
+  for (Client& client : clients){
+    if(client.connection == sock){
+      if (user_id > 0){ //already exists user
+        client.id = user_id;
+        SendSavedMessages(sock, client.id);
+      }
+      else{ //new user
+        int new_id = WorkWithDataFile::GetNewId();
+        WorkWithDataFile::CreateNewUser(new_id);
+        client.id = new_id;
+        
+        std::string message("d");
+        message += std::to_string(new_id);
+        Send(client.connection, message);
+      }
     }
   }
-  SendSavedMessages(sock, name);
   
 }
 
-
-
-void Server::SendSavedMessages(int sock, std::string& name){
-  std::vector<std::string> saved_messages = WorkWithDataFile::GetSavedMessages(name);
+void Server::SendSavedMessages(int sock, int user_id){
+  std::vector<std::string> saved_messages = WorkWithDataFile::GetSavedMessages(user_id);
 
   for (std::string message : saved_messages){
     Send(sock, message);
@@ -45,9 +63,9 @@ void Server::Send(int sock, std::string& message){
   connection.Send(sock, message);
 }
 
-Client Server::FindUser(std::string& name){
+Client Server::FindUser(int user_id){
   for (Client client : clients){
-    if (client.name == name){
+    if (client.id == user_id){
       return client;
     }
   }
@@ -75,12 +93,12 @@ void Server::BrokeConnection(int sock){
   }
 }
 
-std::vector<std::string> Server::GetOnlineUsersNames(){
-  std::vector<std::string> names;
+std::vector<int> Server::GetOnlineUsersId(){
+  std::vector<int> id;
   for(Client& client : clients){
-    names.push_back(client.name);
+    id.push_back(client.id);
   }
-  return names;
+  return id;
 }
 
 
