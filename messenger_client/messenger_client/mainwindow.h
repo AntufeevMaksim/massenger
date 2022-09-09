@@ -37,8 +37,8 @@ private:
     std::unique_ptr<AddNewFriend> add_new_friend_window;
     std::unique_ptr<Chat> user_chat;
     std::unique_ptr<SetUsername> set_username;
-    std::unique_ptr<ServerInterface> server_interface;
-//    ServerInterface server;
+//    std::unique_ptr<ServerInterface> server_interface;
+    ServerInterface server;
     QString user_name;
     int _user_id;
     Chat chat;
