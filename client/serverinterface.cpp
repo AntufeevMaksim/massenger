@@ -1,31 +1,57 @@
 #include "serverinterface.h"
 
 
-ServerInterface::ServerInterface(QString user_name){
-    SendUsername(user_name);
+ServerInterface::ServerInterface(int user_id){
+    SendUserId(user_id);
 }
 
+ServerInterface::ServerInterface(){}
 
+void ServerInterface::SendUserId(int user_id){
+    QString message = QString::number(user_id);
+    message = 'i' + message;
+    server.SendMessage(message);
+}
 
-
-QString ServerInterface::Get_system_info(QString& friend_name, QString& user_name)
+QString ServerInterface::Get_system_info(int friend_id, int user_id)
 {
     QString system_info;
     system_info += "r";
-    system_info += friend_name;
+    system_info += QString::number(friend_id);
     system_info += "|";
-    system_info += user_name;
+    system_info += QString::number(user_id);
     system_info += "|";
-
     return system_info;
 }
 
-void ServerInterface::SendMessage(QString& message, QString& friend_name, QString& user_name){
-    QString ready_message = Get_system_info(friend_name, user_name);
+void ServerInterface::SendMessage(QString& message, int friend_id, int user_id){
+    QString ready_message = Get_system_info(friend_id, user_id);
     ready_message += message;
     server.SendMessage(ready_message);
 
 }
+
+QString ServerInterface::GetUserName(int id){
+    using namespace std::chrono_literals;
+    QString message("N");
+    message += QString::number(id);
+    server.SendMessage(message);
+
+    QString answer;
+    while (answer.isEmpty()){
+        std::this_thread::sleep_for(100ms);
+        for (size_t i=0; i<_messages.size(); i++){
+            if (_messages[i].GetType() == Message::GET_USER_NAME){
+                answer = _messages[i].GetText();
+                _messages.erase(_messages.begin()+i);
+                break;
+            }
+        }
+        answer = ReadMessage(0, Message::GET_USER_NAME);
+    }
+    return answer;
+}
+
 
 QString ServerInterface::GetWhoSend(QString& message){
     QString who_send;
@@ -49,12 +75,15 @@ void ServerInterface::DeleteSystemInfo(QString& message){
 }
 
 
-QString ServerInterface::ReadMessage(QString& friend_name, Message::TypeMessage type_message){
+QString ServerInterface::ReadMessage(int friend_id, Message::TypeMessage type_message){
     QString s_message = server.ReadMessage();
     ParseMessage(s_message);
+    if(!s_message.isEmpty()){
+        printf("1");
+    }
     for (size_t i=0; i < _messages.size(); i++){
         if (_messages[i].GetType() == type_message){
-            if (type_message == Message::REGULAR && _messages[i].GetFriendName() == friend_name){
+            if (type_message == Message::REGULAR && _messages[i].GetFriendId() == friend_id){
                 QString text = _messages[i].GetText();
                 _messages.erase(_messages.begin()+i);
                 return text;
@@ -86,8 +115,6 @@ bool ServerInterface::IsMessageDelemiter(int i, QString& str){
 }
 
 
-ServerInterface::ServerInterface(){}
-
 
 
 
@@ -112,8 +139,7 @@ std::vector<QString> ServerInterface::GetAllUsers(){
                 break;
             }
         }
-        QString s;
-        answer = ReadMessage(s, Message::GET_ALL_USERS);
+        answer = ReadMessage(0, Message::GET_ALL_USERS);
     }
     QString name;
     for (QChar c : answer){
@@ -131,6 +157,25 @@ std::vector<QString> ServerInterface::GetAllUsers(){
 
 }
 
+int ServerInterface::GetUserId(){
+    using namespace std::chrono_literals;
+
+    QString answer;
+    while (answer.isEmpty()){
+        std::this_thread::sleep_for(100ms);
+        for (size_t i=0; i<_messages.size(); i++){
+            if (_messages[i].GetType() == Message::GET_USER_ID){
+                answer = _messages[i].GetText();
+                _messages.erase(_messages.begin()+i);
+                break;
+            }
+        }
+        answer = ReadMessage(0, Message::GET_USER_ID);
+
+    }
+    return answer.toInt();
+}
+
 QString ServerInterface::GetUsersStatus(QString &users){
     using namespace std::chrono_literals;
     users = "s" + users;
@@ -143,8 +188,7 @@ QString ServerInterface::GetUsersStatus(QString &users){
                 return answer;
             }
         }
-        QString a;
-        answer = ReadMessage(a, Message::GET_USERS_STATUS);
+        answer = ReadMessage(0, Message::GET_USERS_STATUS);
     return answer;
 }
 

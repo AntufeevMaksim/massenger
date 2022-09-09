@@ -6,6 +6,12 @@
 #include "ui_addnewfriend.h"
 #include "serverinterface.h"
 
+struct User
+{
+    QString name;
+    int id;
+};
+
 namespace Ui {
 class AddNewFriend;
 }
@@ -22,7 +28,9 @@ private:
     std::unique_ptr<Ui::AddNewFriend> ui = std::make_unique<Ui::AddNewFriend>();
     QListWidget* friends;
     void GetAllUsers();
+    User Parse(QString& user);
     ServerInterface *server;
+    bool IsDelimiter(QString& str, int i);
 
 private slots:
     void onListallUsersClicked(QListWidgetItem* item);

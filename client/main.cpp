@@ -1,12 +1,15 @@
-#include "server.h"
-#include <thread>
-#include <chrono>
+#include "mainwindow.h"
 
-int main(){
-  using namespace std::chrono_literals;
-  Server server;
-  while (true){
-    std::this_thread::sleep_for(100ms);
-    server.Next();
-  }
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+//    QIcon icon("./pig.ico");
+//    a.setWindowIcon(icon);
+//    QMainWindow::setWindowIcon("pig.ico")
+    a.setWindowIcon(QIcon("свинья.ico"));
+    return a.exec();
 }

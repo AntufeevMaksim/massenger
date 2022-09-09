@@ -16,7 +16,7 @@ class Chat : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Chat(QWidget *parent, QString& _user_name, QString& _friend_name, ServerInterface *_server);
+    explicit Chat(QWidget *parent, int user_id, int friend_id, QString& friend_name, ServerInterface *_server);
     Chat();
 
 private slots:
@@ -25,8 +25,9 @@ private slots:
 
 private:
     void AddNewMessage(QString& text, UserType user_type);
-    QString user_name;
-    QString friend_name;
+    int _user_id;
+    int _friend_id;
+    QString _friend_name;
     ServerInterface *server;
     QTimer check_new_message;
     std::unique_ptr<Ui::Chat> ui = std::make_unique<Ui::Chat>();

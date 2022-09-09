@@ -18,19 +18,22 @@ class ServerInterface
 
 public:
     ServerInterface();
-    ServerInterface(QString user_name);
-    void SendMessage(QString& message, QString& friend_name, QString& user_name);
-    QString ReadMessage(QString& friend_name, Message::TypeMessage type_message);
+    ServerInterface(int user_id);
+    void SendMessage(QString& message, int friend_id, int user_id);
+    QString ReadMessage(int friend_id, Message::TypeMessage type_message);
     std::vector<QString> GetAllUsers();
     void BreakConnection();
     QString GetUsersStatus(QString& users);
     void SendUsername(QString username);
+    void SendUserId(int user_id);
+    int GetUserId();
+    QString GetUserName(int id);
 
 private:
     std::vector<Message> _messages;
     std::string user_name;
     Server server;
-    QString Get_system_info(QString& friend_name, QString& user_name);
+    QString Get_system_info(int friend_id, int user_id);
     QString GetWhoSend(QString& message);
     void DeleteSystemInfo(QString& message);
     void ParseMessage(QString& message);

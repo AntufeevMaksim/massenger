@@ -17,6 +17,16 @@ Message::Message(QString message)
         message.remove(0, 1);
         _text = message;
     }
+    else if (message[0] == 'd'){
+        _type = GET_USER_ID;
+        message.remove(0, 1);
+        _text = message;
+    }
+    else if (message[0] == 'N'){
+        _type = GET_USER_NAME;
+        message.remove(0, 1);
+        _text = message;
+    }
 }
 
 void Message::ParseRegularMessage(QString& message){
@@ -25,7 +35,7 @@ void Message::ParseRegularMessage(QString& message){
     for (QChar c : message){
         if (c == '|'){
             message.remove(0, i+1);
-            _friend_name = who_send;
+            _friend_id = who_send.toInt();
         }
         who_send.push_back(c);
         i++;
@@ -33,8 +43,8 @@ void Message::ParseRegularMessage(QString& message){
     _text = message;
 }
 
-QString Message::GetFriendName(){
-    return _friend_name;
+int Message::GetFriendId(){
+    return _friend_id;
 }
 
 QString Message::GetText(){

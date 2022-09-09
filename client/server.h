@@ -1,29 +1,25 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-
-#include "client.h"
-#include "connection.h"
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <QString>
 
 class Server
 {
-private:
-  Connection connection;
-  std::vector<Client> clients;
-  void AddNewConnection();
-  std::vector<std::string> GetMessages(const std::string& message);
-  bool IsMessageDelemiter(int i, const std::string& str);
-  void SendSavedMessages(int sock, std::string& name);
 public:
-  Server();
-  void Next();
-  void Send(int sock, std::string& message);
-  void SetUserName(int sock, std::string& name);
-  std::vector<std::string> GetOnlineUsersNames();
-  void BrokeConnection(int sock);
-  Client FindUser(std::string& name);
+    Server();
+    void SendMessage(QString& message);
+    QString ReadMessage();
+
+private:
+    int sock;
+    int number_message;
+    int Connect();
 };
 
 #endif // SERVER_H
-

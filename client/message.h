@@ -10,15 +10,17 @@ public:
     REGULAR,
     GET_ALL_USERS,
     GET_USERS_STATUS,
+    GET_USER_ID,
+    GET_USER_NAME
     };
     Message(QString message);
-    QString GetFriendName();
+    int GetFriendId();
     QString GetText();
     TypeMessage GetType();
 
 private:
     void ParseRegularMessage(QString& message);
-    QString _friend_name;
+    int _friend_id;
     QString _text;
     TypeMessage _type;
 };
