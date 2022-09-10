@@ -11,7 +11,7 @@
 #include <server.h>
 #include <QObject>
 #include <message.h>
-
+#include <memory>
 
 class ServerInterface
 {
@@ -32,7 +32,7 @@ public:
 private:
     std::vector<Message> _messages;
     std::string user_name;
-    Server server;
+    std::unique_ptr<Server> server;
     QString Get_system_info(int friend_id, int user_id);
     QString GetWhoSend(QString& message);
     void DeleteSystemInfo(QString& message);

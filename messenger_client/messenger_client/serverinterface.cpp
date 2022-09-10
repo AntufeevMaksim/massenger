@@ -10,7 +10,8 @@ ServerInterface::ServerInterface(){}
 void ServerInterface::SendUserId(int user_id){
     QString message = QString::number(user_id);
     message = 'i' + message;
-    server.SendMessage(message);
+    server = std::unique_ptr<Server>(new Server());
+    server->SendMessage(message);
 }
 
 QString ServerInterface::Get_system_info(int friend_id, int user_id)
@@ -27,7 +28,7 @@ QString ServerInterface::Get_system_info(int friend_id, int user_id)
 void ServerInterface::SendMessage(QString& message, int friend_id, int user_id){
     QString ready_message = Get_system_info(friend_id, user_id);
     ready_message += message;
-    server.SendMessage(ready_message);
+    server->SendMessage(ready_message);
 
 }
 
@@ -35,7 +36,7 @@ QString ServerInterface::GetUserName(int id){
     using namespace std::chrono_literals;
     QString message("N");
     message += QString::number(id);
-    server.SendMessage(message);
+    server->SendMessage(message);
 
     QString answer;
     while (answer.isEmpty()){
@@ -76,7 +77,7 @@ void ServerInterface::DeleteSystemInfo(QString& message){
 
 
 QString ServerInterface::ReadMessage(int friend_id, Message::TypeMessage type_message){
-    QString s_message = server.ReadMessage();
+    QString s_message = server->ReadMessage();
     ParseMessage(s_message);
     if(!s_message.isEmpty()){
         printf("1");
@@ -129,7 +130,7 @@ std::vector<QString> ServerInterface::GetAllUsers(){
     std::vector<QString> all_users;
     QString answer;
     QString request{'g'};
-    server.SendMessage(request);
+    server->SendMessage(request);
     while (answer.isEmpty()){
         std::this_thread::sleep_for(100ms);
         for (size_t i=0; i<_messages.size(); i++){
@@ -179,7 +180,7 @@ int ServerInterface::GetUserId(){
 QString ServerInterface::GetUsersStatus(QString &users){
     using namespace std::chrono_literals;
     users = "s" + users;
-    server.SendMessage(users);
+    server->SendMessage(users);
     QString answer;
         for (size_t i=0; i<_messages.size(); i++){
             if (_messages[i].GetType() == Message::GET_USERS_STATUS){
@@ -197,22 +198,10 @@ QString ServerInterface::GetUsersStatus(QString &users){
 
 void ServerInterface::BreakConnection(){
     QString b{'b'};
-    server.SendMessage(b);
+    server->SendMessage(b);
 }
 
 void ServerInterface::SendUsername(QString username){
     username = "n" + username;
-    server.SendMessage(username);
+    server->SendMessage(username);
 }
-
-
-
-
-
-
-
-
-
-
-
-
