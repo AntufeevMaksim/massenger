@@ -22,7 +22,7 @@ void MainWindow::onListMailItemDoubleClicked(QListWidgetItem *item){
 }
 
 void MainWindow::CheckFriendsStatus(){
-    /*
+
     QString all_friends;
     for (int i = 0; i < ui->friends->count(); ++i){
         QVariant data = ui->friends->item(i)->data(Qt::UserRole);
@@ -42,7 +42,7 @@ void MainWindow::CheckFriendsStatus(){
            ui->friends->item(i)->setBackground(Qt::red);
         }
     }
-*/
+
 }
 
 
@@ -62,7 +62,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->friends, SIGNAL(itemClicked(QListWidgetItem*)),
                 this, SLOT(onListMailItemClicked(QListWidgetItem*)));
 
-    server = ServerInterface(_user_id);
     if (_user_id == 0){
         _user_id = server.GetUserId();
         UserData::SaveUserId(_user_id);
