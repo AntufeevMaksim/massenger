@@ -16,7 +16,7 @@ void Chat::AddNewMessage(QString& text, UserType user_type){
         new_message->setBackground(Qt::green);
     }
     ui->user_chat->addItem(new_message);
-//    UserData::AddNewMessage(_friend_id, text, user_type);
+    UserData::AddNewMessage(_friend_id, text, user_type);
 
 }
 
@@ -34,7 +34,7 @@ Chat::Chat(QWidget *parent, int user_id, int friend_id, QString& friend_name, Se
     _friend_name = friend_name;
     server = _server;
     connect(&check_new_message, SIGNAL(timeout()), this, SLOT(CheckNewMessage()));
-//    UserData::LoadChatHistory(ui->user_chat, _friend_id);
+    UserData::LoadChatHistory(ui->user_chat, _friend_id);
     check_new_message.start(1000);
 }
 

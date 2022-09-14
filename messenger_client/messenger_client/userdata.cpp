@@ -238,8 +238,8 @@ void UserData::AddNewMessage(int id, QString string_message, UserType& user_type
     message.SetString(ready_message.c_str(), ready_message.size());
 
     for (SizeType i = 0; i < users.Size(); i++){
-      if(users[i][0].GetInt() == id){
-        users[i].PushBack(message, doc.GetAllocator());
+      if(users[i]["id"].GetInt() == id){
+        users[i]["chat_history"].PushBack(message, doc.GetAllocator());
         break;
       }
     }
@@ -269,13 +269,13 @@ void UserData::LoadChatHistory(QListWidget *chat, int id){
     Value& users = doc["my_friends"];
 
     for (SizeType i = 0; i < users.Size(); i++){
-        if(users[i][0].GetInt() == id){
-            for (SizeType i2 = 1; i2 < users[i].Size(); i2++){
+        if(users[i]["id"].GetInt() == id){
+            for (SizeType i2 = 0; i2 < users[i]["chat_history"].Size(); i2++){
                 QListWidgetItem *message = new QListWidgetItem;
-                QString text = users[i][i2].GetString();
+                QString text = users[i]["chat_history"][i2].GetString();
                 text.remove(0,1);
                 message->setText(text.toStdString().c_str());
-                if(users[i][i2].GetString()[0] == 'u'){
+                if(users[i]["chat_history"][i2].GetString()[0] == 'u'){
                     message->setBackground(Qt::green);
                 }
                 chat->addItem(message);
