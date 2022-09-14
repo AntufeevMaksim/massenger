@@ -10,7 +10,7 @@ ServerInterface::ServerInterface(){}
 void ServerInterface::SendUserId(int user_id){
     QString message = QString::number(user_id);
     message = 'i' + message;
-    server = std::unique_ptr<Server>(new Server());
+    server = std::make_unique<Server>();
     server->SendMessage(message);
 }
 
@@ -79,9 +79,6 @@ void ServerInterface::DeleteSystemInfo(QString& message){
 QString ServerInterface::ReadMessage(int friend_id, Message::TypeMessage type_message){
     QString s_message = server->ReadMessage();
     ParseMessage(s_message);
-    if(!s_message.isEmpty()){
-        printf("1");
-    }
     for (size_t i=0; i < _messages.size(); i++){
         if (_messages[i].GetType() == type_message){
             if (type_message == Message::REGULAR && _messages[i].GetFriendId() == friend_id){

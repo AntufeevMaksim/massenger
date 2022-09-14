@@ -38,7 +38,7 @@ void AddNewFriend::onListallUsersClicked(QListWidgetItem* item){
     new_friend->setText(name);
     new_friend->setData(Qt::UserRole, item->data(Qt::UserRole));
     friends->addItem(new_friend);
-    UserData::AddNewFriend(name);
+    UserData::AddNewFriend(new_friend);
 }
 
 User AddNewFriend::Parse(QString &user){

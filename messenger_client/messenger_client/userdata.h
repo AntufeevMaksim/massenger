@@ -15,7 +15,7 @@ public:
     static QString LoadUsername();
     static int LoadUserId();
     static void SetUsername(QString& username);
-    static void AddNewFriend(QString& str_name);
+    static void AddNewFriend(QListWidgetItem* new_friend);
     static void AddNewMessage(int id, QString string_message, UserType& user_type);
     static void LoadChatHistory(QListWidget *chat, int id);
     static void SaveUserId(int user_id);

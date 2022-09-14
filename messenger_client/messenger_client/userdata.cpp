@@ -109,7 +109,6 @@ void UserData::LoadListFriends(QListWidget& users, ServerInterface *server){
         user->setData(Qt::UserRole, id);
         user->setText(server->GetUserName(id));
         users.addItem(user);
-        users.item(0)->data(Qt::UserRole).value<int>();
     }
     ifs.close();
 }
@@ -127,8 +126,10 @@ void UserData::DeleteFriend(QListWidget &users, QListWidgetItem &user){
 
     Value& friends = doc["my_friends"];
 
+    QVariant data = user.data(Qt::UserRole);
+    int user_id = data.toInt();
     for (SizeType i = 0; i < friends.Size(); i++){
-        if(!std::strcmp(friends[i][0].GetString(), user.text().toStdString().c_str())){
+        if(user_id == friends[i]["id"].GetInt()){
             friends.Erase(friends.Begin() + i);
         }
     }
@@ -173,7 +174,7 @@ void UserData::SetUsername(QString &username){
 }
 
 
-void UserData::AddNewFriend(QString &str_name){
+void UserData::AddNewFriend(QListWidgetItem* new_friend){
     using namespace rapidjson;
 
     Document doc;
@@ -184,13 +185,23 @@ void UserData::AddNewFriend(QString &str_name){
     doc.ParseStream( isw );
     ifs.close();
 
-    Value friend_;
-    friend_.SetArray();
-    Value name;
-    name.SetString(str_name.toStdString().c_str(), str_name.size());
-    friend_.PushBack(name, doc.GetAllocator());
+    Value new_user(rapidjson::kObjectType);
 
-    doc["my_friends"].PushBack(friend_, doc.GetAllocator());
+    Value name;
+    name.SetString(new_friend->text().toStdString().c_str(), new_friend->text().size());
+    new_user.AddMember("name", name, doc.GetAllocator());
+
+    Value id;
+    QVariant data = new_friend->data(Qt::UserRole);
+    int user_id = data.toInt();
+    id.SetInt(user_id);
+    new_user.AddMember("id", id, doc.GetAllocator());
+
+    Value chat_history;
+    chat_history.SetArray();
+    new_user.AddMember("chat_history", chat_history, doc.GetAllocator());
+
+    doc["my_friends"].PushBack(new_user, doc.GetAllocator());
 
     FILE* fp = fopen("userdata.json", "w");
 
