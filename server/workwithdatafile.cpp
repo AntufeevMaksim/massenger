@@ -9,54 +9,23 @@
 
 #include <fstream>
 #include <cstring>
-/*
-void WorkWithDataFile::SetUserName(std::string& new_name, std::string& old_name){
-    if (new_name == old_name){
-      return;
-    }
 
+#include <memory>
+
+void SaveFile(rapidjson::Document& doc){
     using namespace rapidjson;
-    Document doc;
-    std::ifstream ifs { R"(data.json)" };
 
-    IStreamWrapper isw { ifs };
-
-    doc.ParseStream( isw );
-    ifs.close();
-
-
-    Value& users = doc["users"];
-    Value name;
-    name.SetString(new_name.c_str(), new_name.size());
-
-    bool this_new_user = true;
-    for (SizeType i = 0; i < users.Size(); i++){
-      if (!std::strcmp(users[i]["name"].GetString(), old_name.c_str()) || !std::strcmp(users[i]["name"].GetString(), new_name.c_str())){
-        users[i]["name"] = name;
-        this_new_user = false;
-        break;
-      }
-    }
-
-    if(this_new_user){
-      Value new_user = WorkWithDataFile::CreateNewUser(name, doc);
-      users.PushBack(new_user, doc.GetAllocator());
-    }
-
-    
-    FILE* fp = fopen("data.json", "w");
+    using unique_file_t = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
+    unique_file_t fp(std::fopen("data.json", "w"), &std::fclose);
 
     char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
+    FileWriteStream os(fp.get(), buffer, sizeof(buffer));
 
     Writer<FileWriteStream> writer(os);
     doc.Accept(writer);
-
-    fclose(fp);
-    
-   Save(doc);
 }
-*/
+
+
 void WorkWithDataFile::ChangeUserName(int user_id, std::string& new_name){
   using namespace rapidjson;
   Document doc;
@@ -77,15 +46,7 @@ void WorkWithDataFile::ChangeUserName(int user_id, std::string& new_name){
       break;
     }
   }
-    FILE* fp = fopen("data.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
+    SaveFile(doc);
 }
 
 
@@ -138,17 +99,7 @@ void WorkWithDataFile::SaveMessageForOfflineUser(int user_id, std::string& ready
       }
     }
     
-    FILE* fp = fopen("data.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
-    
-   //WorkWithDataFile::Save(doc);
+    SaveFile(doc);
 
 }
 
@@ -178,17 +129,8 @@ std::vector<std::string> WorkWithDataFile::GetSavedMessages(int user_id){
       }
     }
   
-   FILE* fp = fopen("data.json", "w");
+   SaveFile(doc);
 
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
-  
-  //WorkWithDataFile::Save(doc);
   return saved_messages;
 
 }
@@ -221,16 +163,7 @@ void WorkWithDataFile::CreateNewUser(int user_id){
 
   users.PushBack(new_user, doc.GetAllocator());
 
-  FILE* fp = fopen("data.json", "w");
-
-  char buffer[1024];
-  FileWriteStream os(fp, buffer, sizeof(buffer));
-
-  Writer<FileWriteStream> writer(os);
-  doc.Accept(writer);
-
-  fclose(fp);
-  //WorkWithDataFile::Save(doc);
+  SaveFile(doc);
 
 }
 

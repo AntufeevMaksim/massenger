@@ -48,8 +48,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    ../../../../../forprog/dict3/hr
+#DISTFILES += \
+#    ../../../../../forprog/dict3/hr
 
 ICON = свинья.ico
 

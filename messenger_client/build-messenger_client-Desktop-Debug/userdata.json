@@ -1,1 +1,1 @@
-{"id":1,"username":"QT","my_friends":[{"id":1,"messages":[]}]}
+{"id":1,"username":"QT","my_friends":[{"name":"QT","id":1,"chat_history":["u1234","f1234"]},{"name":"Maksim","id":2,"chat_history":["fhello QT","fhello qt 2","fhello qt 3"]}]}

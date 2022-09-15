@@ -7,6 +7,14 @@
 #include "usertype.h"
 #include "serverinterface.h"
 
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/filewritestream.h>
+#include "rapidjson/filereadstream.h"
+#include <rapidjson/prettywriter.h>
 class UserData
 {
 public:

@@ -2,18 +2,24 @@
 
 #include "serverinterface.h"
 
-#include <rapidjson/document.h>
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/ostreamwrapper.h>
-#include <rapidjson/filewritestream.h>
-#include "rapidjson/filereadstream.h"
-#include <rapidjson/prettywriter.h>
-
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+
+void SaveFile(rapidjson::Document& doc){
+    using namespace rapidjson;
+
+    using unique_file_t = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
+    unique_file_t fp(std::fopen("userdata.json", "w"), &std::fclose);
+
+    char buffer[1024];
+    FileWriteStream os(fp.get(), buffer, sizeof(buffer));
+
+    Writer<FileWriteStream> writer(os);
+    doc.Accept(writer);
+}
+
+
 
 int UserData::LoadUserId(){
     using namespace rapidjson;
@@ -52,15 +58,7 @@ void UserData::SaveUserId(int user_id){
     id.SetInt(user_id);
     doc["id"] = id;
 
-    FILE* fp = fopen("userdata.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
+    SaveFile(doc);
 }
 
 
@@ -134,15 +132,7 @@ void UserData::DeleteFriend(QListWidget &users, QListWidgetItem &user){
         }
     }
 
-    FILE* fp = fopen("userdata.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
+    SaveFile(doc);
 
     delete users.takeItem(users.row(&user));
 }
@@ -161,15 +151,7 @@ void UserData::SetUsername(QString &username){
 
     doc["username"].SetString(username.toStdString().c_str(), username.size());
 
-    FILE* fp = fopen("userdata.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
+    SaveFile(doc);
 
 }
 
@@ -203,15 +185,7 @@ void UserData::AddNewFriend(QListWidgetItem* new_friend){
 
     doc["my_friends"].PushBack(new_user, doc.GetAllocator());
 
-    FILE* fp = fopen("userdata.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
+    SaveFile(doc);
 }
 
 
@@ -244,16 +218,10 @@ void UserData::AddNewMessage(int id, QString string_message, UserType& user_type
       }
     }
 
-    FILE* fp = fopen("userdata.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
+    SaveFile(doc);
 }
+
+
 
 void UserData::LoadChatHistory(QListWidget *chat, int id){
 
@@ -283,14 +251,6 @@ void UserData::LoadChatHistory(QListWidget *chat, int id){
         }
     }
 
+    SaveFile(doc);
 
-    FILE* fp = fopen("userdata.json", "w");
-
-    char buffer[1024];
-    FileWriteStream os(fp, buffer, sizeof(buffer));
-
-    Writer<FileWriteStream> writer(os);
-    doc.Accept(writer);
-
-    fclose(fp);
 }
